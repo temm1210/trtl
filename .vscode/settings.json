@@ -12,5 +12,9 @@
     {
       "mode": "auto"
     }
-  ]
+  ],
+  // eslint --fix를 실행
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  }
 }
