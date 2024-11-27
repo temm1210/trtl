@@ -18,25 +18,35 @@ module.exports = {
     node: true,
     browser: true,
   },
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    project: true,
+  },
   rules: {
-    "sort-imports": [
-      "error",
-      {
-        ignoreDeclarationSort: true,
-      },
-    ],
     "import/order": [
       "error",
       {
         "newlines-between": "always",
-        groups: ["builtin", "external", "internal"],
+        groups: [
+          "builtin",
+          "external",
+          "internal",
+          ["sibling", "parent"],
+          "unknown",
+        ],
         pathGroups: [
           { pattern: "react", group: "builtin", position: "after" },
           { pattern: "react-dom", group: "builtin", position: "after" },
+          {
+            pattern: "**/*.css",
+            group: "unknown",
+            position: "after",
+          },
         ],
         pathGroupsExcludedImportTypes: [],
         alphabetize: {
           order: "asc",
+          caseInsensitive: true,
         },
       },
     ],
