@@ -1,0 +1,9 @@
+{
+  "name": "@rtl/test-config",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "jestSetup.ts",
+    "test-utils.tsx"
+  ]
+}
