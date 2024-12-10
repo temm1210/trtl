@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 
 export function render(
   ui: React.ReactElement,
-  options?: RenderOptions
+  options?: RenderOptions,
 ): ReturnType<typeof rtlRender> & {
   userEvent: ReturnType<typeof userEvent.setup>;
 } {

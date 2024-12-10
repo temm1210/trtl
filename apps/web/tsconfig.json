@@ -1,9 +1,19 @@
 {
   "extends": "@rtl/typescript-config/nextjs.json",
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
   // "compilerOptions": {
   //   "declaration": false,
   //   "declarationMap": false
   // },
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ],
+  "compilerOptions": {
+    "jsx": "preserve"
+  }
 }
