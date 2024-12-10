@@ -2,9 +2,10 @@
   "name": "rtl",
   "private": true,
   "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "check-types": "turbo run check-types",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "ui:storybook": "turbo run storybook --filter=@rtl/ui",
     "prepare": "husky"
@@ -30,10 +31,7 @@
     "typescript": "^5.6.2"
   },
   "lint-staged": {
-    "{packages,apps}/**/src/**/*.{js,ts,jsx,tsx}": [
-      "prettier --write",
-      "eslint --fix"
-    ]
+    "*.{js,ts,jsx,tsx}": []
   },
   "packageManager": "pnpm@9.12.0",
   "engines": {
