@@ -105,6 +105,18 @@ importers:
 
   packages/config/typescript: {}
 
+  packages/react:
+    devDependencies:
+      '@rtl/eslint-config':
+        specifier: workspace:*
+        version: link:../config/eslint
+      '@rtl/typescript-config':
+        specifier: workspace:*
+        version: link:../config/typescript
+      eslint:
+        specifier: ^8
+        version: 8.57.1
+
   packages/ui:
     devDependencies:
       '@chromatic-com/storybook':
