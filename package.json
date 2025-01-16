@@ -7,7 +7,8 @@
     "check-types": "turbo run check-types",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "ui:storybook": "turbo run storybook --filter=@rtl/ui",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:react": "jest --selectProjects=react"
   },
   "dependencies": {
     "react": "19.0.0",

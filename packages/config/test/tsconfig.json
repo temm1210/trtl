@@ -1,8 +1,0 @@
-{
-  "extends": "@rtl/typescript-config/react-library.json",
-  "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "Bundler"
-  },
-  "exclude": ["node_modules"]
-}

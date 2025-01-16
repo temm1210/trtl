@@ -4,13 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "test:watch": "jest --watch",
+    "test:watch": "jest --watch --maxWorkers=1",
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {
     "@rtl/eslint-config": "workspace:*",
     "@rtl/typescript-config": "workspace:*",
-    "@rtl/test-config": "workspace:*",
     "eslint": "^8"
   }
 }
