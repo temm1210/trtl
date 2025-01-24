@@ -5,17 +5,30 @@ const config = {
       testPathIgnorePatterns: ["<rootDir>/node_modules/", "<rootDir>/.next/"],
       displayName: "react",
       testMatch: ["<rootDir>/packages/react/**/*.test.(js|ts|tsx)"],
-      transform: {
-        "^.+\\.(t|j)sx?$": ["@swc/jest"],
+      testEnvironment: "jsdom",
+      moduleNameMapper: {
+        "^@/(.*)$": "<rootDir>/packages/react/src/$1",
       },
-      extensionsToTreatAsEsm: [".ts", ".tsx"],
+      transform: {
+        "^.+\\.(t|j)sx?$": [
+          "@swc/jest",
+          {
+            jsc: {
+              transform: {
+                react: {
+                  runtime: "automatic",
+                },
+              },
+            },
+          },
+        ],
+      },
     },
   ],
   clearMocks: true,
   verbose: true,
   clearMocks: true,
   setupFilesAfterEnv: ["./setupTest.ts"],
-  testEnvironment: "jsdom",
   //   silent: true,
 };
 

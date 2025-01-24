@@ -5,10 +5,10 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "check-types": "turbo run check-types",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format": "prettier --write \"**/*.{ts,tsx}\"",
     "ui:storybook": "turbo run storybook --filter=@rtl/ui",
     "prepare": "husky",
-    "test:react": "jest --selectProjects=react"
+    "test:react": "jest --maxWorkers=1 --selectProjects=react --watch "
   },
   "dependencies": {
     "react": "19.0.0",
@@ -18,6 +18,7 @@
     "@swc/core": "^1.9.3",
     "@swc/jest": "^0.2.37",
     "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",
     "@types/jest": "^29.5.14",
