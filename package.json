@@ -5,7 +5,6 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "check-types": "turbo run check-types",
-    "format": "prettier --write \"**/*.{ts,tsx}\"",
     "ui:storybook": "turbo run storybook --filter=@rtl/ui",
     "prepare": "husky",
     "test:react": "jest --maxWorkers=1 --selectProjects=react --watch "
@@ -34,11 +33,9 @@
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [
-      "pnpm run format"
+      "eslint --fix",
+      "prettier --write"
     ]
   },
-  "packageManager": "pnpm@9.12.0",
-  "engines": {
-    "node": ">=20"
-  }
+  "packageManager": "pnpm@9.12.0"
 }
