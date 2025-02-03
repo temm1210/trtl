@@ -6,7 +6,6 @@ const path = require("path");
 
 // use __dirname instead of path.cwd() because lint-staged run on root directory in this project
 const buildEslintCommand = (filenames) => {
-  console.log("filenames:", filenames);
   return `next lint --fix --file ${filenames
     .map((f) => path.relative(__dirname, f))
     .join(" --file ")}`;
