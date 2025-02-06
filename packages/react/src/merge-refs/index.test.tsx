@@ -20,11 +20,17 @@ it("mergeRefs call with ref, null, undefined", async () => {
   expect(ref1.current).toBe(undefined);
   expect(ref2).toHaveBeenCalledTimes(0);
 
-  const { findByTestId } = render(<Component />);
+  const { findByTestId, unmount } = render(<Component />);
 
   const element = await findByTestId("merge-ref-test");
 
   expect(ref1.current).toBe(element);
   expect(ref2).toHaveBeenCalledTimes(1);
   expect(ref2).toHaveBeenCalledWith(element);
+
+  unmount();
+
+  expect(ref1.current).toBeNull();
+  expect(ref2).toHaveBeenCalledTimes(2);
+  expect(ref2).toHaveBeenCalledWith(null);
 });
