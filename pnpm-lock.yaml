@@ -109,14 +109,14 @@ importers:
 
   packages/config/typescript: {}
 
-  packages/react:
+  packages/react/core:
     devDependencies:
       '@rtl/eslint-config':
         specifier: workspace:*
-        version: link:../config/eslint
+        version: link:../../config/eslint
       '@rtl/typescript-config':
         specifier: workspace:*
-        version: link:../config/typescript
+        version: link:../../config/typescript
       eslint:
         specifier: ^8
         version: 8.57.1

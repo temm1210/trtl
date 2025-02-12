@@ -1,4 +1,4 @@
-const base = require("../../jest.config");
+const base = require("../../../jest.config");
 
 /** @type {import('jest').Config} */
 const config = {
