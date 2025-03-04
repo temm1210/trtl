@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "test:watch": "jest --watch --maxWorkers=1",
+    "test:watch": "vitest watch",
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {

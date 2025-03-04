@@ -2,9 +2,9 @@ import { render } from "@/test/utils";
 
 import mergeRefs from ".";
 
-it("mergeRefs call with ref, null, undefined", async () => {
+test("mergeRefs call with ref, null, undefined", async () => {
   const ref1 = { current: undefined };
-  const ref2 = jest.fn();
+  const ref2 = vi.fn();
 
   const Component = () => {
     return (

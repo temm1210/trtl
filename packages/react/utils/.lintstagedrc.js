@@ -2,7 +2,7 @@ export default {
   "*.{js,jsx,ts,tsx}": [
     "eslint --fix",
     () => "tsc --project . --noEmit",
-    "jest --bail --findRelatedTests --passWithNoTests",
+    "vitest related --bail=1 --run ",
     "prettier --write",
   ],
 };
