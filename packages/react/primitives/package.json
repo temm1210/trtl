@@ -12,7 +12,6 @@
   "devDependencies": {
     "@rtl/eslint-config": "workspace:*",
     "@rtl/typescript-config": "workspace:*",
-    "@rtl/react-utils": "workspace:*",
-    "eslint": "^8"
+    "@rtl/react-utils": "workspace:*"
   }
 }

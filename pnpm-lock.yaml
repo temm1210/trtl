@@ -69,6 +69,9 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^4.3.2
         version: 4.3.2(vite@5.4.9(@types/node@22.10.2))
+      eslint:
+        specifier: ^8
+        version: 8.57.1
       eslint-plugin-storybook:
         specifier: ^0.11.3
         version: 0.11.3(eslint@8.57.1)(typescript@5.7.2)
@@ -112,9 +115,6 @@ importers:
       '@rtl/typescript-config':
         specifier: workspace:*
         version: link:../../packages/config/typescript
-      eslint:
-        specifier: ^8
-        version: 8.57.1
 
   packages/config/eslint:
     dependencies:
@@ -160,9 +160,6 @@ importers:
       '@rtl/typescript-config':
         specifier: workspace:*
         version: link:../../config/typescript
-      eslint:
-        specifier: ^8
-        version: 8.57.1
 
   packages/react/utils:
     devDependencies:
@@ -172,9 +169,6 @@ importers:
       '@rtl/typescript-config':
         specifier: workspace:*
         version: link:../../config/typescript
-      eslint:
-        specifier: ^8
-        version: 8.57.1
 
   packages/ui:
     devDependencies:
@@ -184,9 +178,6 @@ importers:
       '@rtl/typescript-config':
         specifier: workspace:*
         version: link:../config/typescript
-      eslint:
-        specifier: ^8
-        version: 8.57.1
 
 packages:
 
