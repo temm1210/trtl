@@ -9,7 +9,11 @@ interface SlotProps extends React.HTMLAttributes<HTMLElement> {
 const Slot = ({ children, ...slotProps }: SlotProps) => {
   const props = mergeProps(slotProps, children.props);
 
-  return <div {...props}>{children}</div>;
+  if (React.Children.count(children) !== 1) {
+    throw new Error("Slot must have exactly one child");
+  }
+
+  return React.cloneElement(children, props);
 };
 
 function mergeProps(

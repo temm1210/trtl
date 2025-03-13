@@ -14,12 +14,20 @@ const meta: Meta<typeof Slot> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Slot1: Story = {
+export const Base: Story = {
   args: {},
   render: () => {
     return (
-      <Slot onClick={() => console.log("clicked")}>
-        <div onClick={() => console.log("clicked2")}>Slot 1</div>
+      <Slot
+        className="slot classname"
+        onClick={() => console.log("slot clicked")}
+      >
+        <button
+          className="child classname"
+          onClick={() => console.log("child clicked")}
+        >
+          Slot
+        </button>
       </Slot>
     );
   },
