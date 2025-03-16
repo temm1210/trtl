@@ -1,6 +1,6 @@
 import React from "react";
 
-interface SlotProps extends React.HTMLAttributes<HTMLElement> {
+export interface SlotProps extends React.HTMLAttributes<HTMLElement> {
   children: React.ReactElement<HTMLElement>;
   ref?: React.Ref<HTMLElement>;
 }

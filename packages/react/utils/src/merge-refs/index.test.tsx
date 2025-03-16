@@ -1,6 +1,6 @@
 import { render } from "@/test/utils";
 
-import mergeRefs from ".";
+import mergeRefs from "./";
 
 test("mergeRefs call with ref, null, undefined", async () => {
   const ref1 = { current: undefined };
