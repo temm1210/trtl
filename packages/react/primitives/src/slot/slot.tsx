@@ -1,5 +1,7 @@
 import React from "react";
 
+import { mergeRefs } from "@rtl/react-utils";
+
 interface SlotProps extends React.HTMLAttributes<HTMLElement> {
   children: React.ReactElement<HTMLElement>;
   ref?: React.Ref<HTMLElement>;
@@ -8,6 +10,13 @@ interface SlotProps extends React.HTMLAttributes<HTMLElement> {
 /** A component that passes its props to its child and renders its child */
 const Slot = ({ children, ...slotProps }: SlotProps) => {
   const props = mergeProps(slotProps, children.props);
+
+  const childRef = (children.props as React.RefAttributes<any>).ref;
+  const slotRef = slotProps.ref;
+
+  if (childRef || slotRef) {
+    props.ref = mergeRefs([childRef, slotRef]);
+  }
 
   if (React.Children.count(children) !== 1) {
     throw new Error("Slot must have exactly one child");
