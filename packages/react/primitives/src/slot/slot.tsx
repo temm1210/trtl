@@ -1,6 +1,6 @@
 import React from "react";
 
-export interface SlotProps extends React.HTMLAttributes<HTMLElement> {
+interface SlotProps extends React.HTMLAttributes<HTMLElement> {
   children: React.ReactElement<HTMLElement>;
   ref?: React.Ref<HTMLElement>;
 }
@@ -18,12 +18,12 @@ const Slot = ({ children, ...slotProps }: SlotProps) => {
 
 function mergeProps(
   slotProps: Record<string, any>,
-  childProps: Record<string, any>
+  childProps: Record<string, any>,
 ) {
   const mergedProps: Record<string, any> = { ...slotProps, ...childProps };
 
   const eventHandlerNames = Object.keys(mergedProps).filter((propName) =>
-    /^on[A-Z]/.test(propName)
+    /^on[A-Z]/.test(propName),
   );
 
   for (const eventHandlerName of eventHandlerNames) {
@@ -39,7 +39,7 @@ function mergeProps(
 
   if (slotProps.className) {
     mergedProps.className = [slotProps.className, childProps.className].join(
-      " "
+      " ",
     );
   }
 
