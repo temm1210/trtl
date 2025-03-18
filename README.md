@@ -1,8 +1,12 @@
-# react template
+# react vitest template
 
 ## config
 
 common config
+
+## primitives
+
+headless component
 
 ## ui
 
