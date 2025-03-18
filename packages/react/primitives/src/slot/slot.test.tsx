@@ -81,4 +81,22 @@ describe("Slot tests", () => {
     expect(handleSlotClick).toReturnWith("slot");
     expect(handleSlotChildClick).toReturnWith("slot child");
   });
+
+  test("merge slot ref and child ref", () => {
+    const slotRef = vi.fn();
+    const childRef = vi.fn();
+
+    const Component = () => {
+      return (
+        <Slot ref={slotRef}>
+          <div ref={childRef} />
+        </Slot>
+      );
+    };
+
+    render(<Component />);
+
+    expect(childRef).toHaveBeenCalledTimes(1);
+    expect(slotRef).toHaveBeenCalledTimes(1);
+  });
 });
