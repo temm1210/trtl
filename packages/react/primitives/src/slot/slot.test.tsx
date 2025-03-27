@@ -6,12 +6,12 @@ const serialize = (html: string) =>
   html.replace(/>\s+</g, "><").replace(/\s+/g, " ").trim();
 
 describe("Slot tests", () => {
-  test("render child", async () => {
+  test("render child correctly", async () => {
     const Component = () => {
       return (
-        <div id="container">
-          <Slot>
-            <div id="child">
+        <div className="container">
+          <Slot className="slot" id="slot">
+            <div className="child" id="child">
               <span>span</span>
               <p>p</p>
               <strong>strong</strong>
@@ -24,8 +24,8 @@ describe("Slot tests", () => {
     const dom = render(<Component />);
 
     const result = `
-        <div id="container">
-          <div id="child">
+        <div class="container">
+          <div class="slot child" id="child">
             <span>span</span>
             <p>p</p>
             <strong>strong</strong>
