@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@rtl/eslint-config": "workspace:*",
-    "@rtl/typescript-config": "workspace:*"
+    "@rtl/typescript-config": "workspace:*",
+    "@rtl/react-primitives": "workspace:*"
   }
 }

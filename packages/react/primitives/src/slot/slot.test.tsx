@@ -99,4 +99,19 @@ describe("Slot tests", () => {
     expect(childRef).toHaveBeenCalledTimes(1);
     expect(slotRef).toHaveBeenCalledTimes(1);
   });
+
+  test("throw error if slot has more than one child", () => {
+    const Component = () => {
+      return (
+        <Slot>
+          <div />
+          <div />
+        </Slot>
+      );
+    };
+
+    expect(() => render(<Component />)).toThrowError(
+      "Slot must have exactly one child",
+    );
+  });
 });

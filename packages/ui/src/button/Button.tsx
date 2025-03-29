@@ -1,3 +1,7 @@
+import React from "react";
+
+import { Slot } from "@rtl/react-primitives";
+
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   size: "small" | "medium" | "large";
@@ -12,14 +16,15 @@ export interface ButtonProps
 
 // #16A349
 export const Button = ({
-  size = "medium",
+  useChild = false,
   children,
   ...buttonProps
 }: ButtonProps) => {
-  console.log(size);
+  const Comp = useChild ? Slot : "button";
+
   return (
-    <button type="button" {...buttonProps}>
+    <Comp type="button" {...buttonProps}>
       {children}
-    </button>
+    </Comp>
   );
 };
