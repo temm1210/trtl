@@ -1,5 +1,6 @@
 import React from "react";
 
+import { css } from "@emotion/react";
 import { Slot } from "@rtl/react-primitives";
 
 export interface ButtonProps
@@ -14,8 +15,7 @@ export interface ButtonProps
   endIcon?: React.ReactNode;
 }
 
-// #16A349
-export const Button = ({
+const Button = ({
   useChild = false,
   children,
   ...buttonProps
@@ -23,8 +23,17 @@ export const Button = ({
   const Comp = useChild ? Slot : "button";
 
   return (
-    <Comp type="button" {...buttonProps}>
+    <Comp css={containerCss} type="button" {...buttonProps}>
       {children}
     </Comp>
   );
 };
+
+const containerCss = css`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #16a349;
+`;
+
+export default Button;

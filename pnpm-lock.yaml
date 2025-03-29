@@ -184,6 +184,9 @@ importers:
       '@rtl/react-primitives':
         specifier: workspace:*
         version: link:../react/primitives
+      '@rtl/react-utils':
+        specifier: workspace:*
+        version: link:../react/utils
       '@rtl/typescript-config':
         specifier: workspace:*
         version: link:../config/typescript
