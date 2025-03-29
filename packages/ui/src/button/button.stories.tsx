@@ -10,10 +10,23 @@ const meta: Meta<typeof Button> = {
     layout: "centered",
   },
   tags: ["autodocs"],
-  // argTypes: {
-  //   backgroundColor: { control: "color" },
-  // },
   args: { onClick: fn() },
+  decorators: [
+    (Story) => {
+      return (
+        <div
+          style={{
+            display: "flex",
+            gap: "1rem",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Story />
+        </div>
+      );
+    },
+  ],
 };
 
 export default meta;
@@ -21,7 +34,30 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
   args: {
-    useChild: false,
     children: <span>text</span>,
   },
+  argTypes: {
+    size: {
+      control: false,
+    },
+    children: {
+      control: false,
+    },
+    asChild: {
+      control: false,
+    },
+  },
+  render: (args) => (
+    <>
+      <Button {...args} size="small">
+        Button
+      </Button>
+      <Button {...args} size="medium">
+        Button
+      </Button>
+      <Button {...args} size="large">
+        Button
+      </Button>
+    </>
+  ),
 };
