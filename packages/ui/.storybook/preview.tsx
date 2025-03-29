@@ -1,6 +1,17 @@
 import type { Preview } from "@storybook/react";
+import React from "react";
+import { RtlProvider } from "../src/provider";
 
 const preview: Preview = {
+  decorators: [
+    (Story) => {
+      return (
+        <RtlProvider>
+          <Story />
+        </RtlProvider>
+      );
+    },
+  ],
   parameters: {
     controls: {
       matchers: {
