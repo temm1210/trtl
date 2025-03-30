@@ -10,14 +10,49 @@ const meta: Meta<typeof Button> = {
     layout: "centered",
   },
   tags: ["autodocs"],
-  args: { onClick: fn() },
+  args: {
+    onClick: fn(),
+  },
+  argTypes: {
+    size: {
+      control: false,
+    },
+    children: {
+      control: false,
+    },
+    asChild: {
+      control: false,
+    },
+  },
+  render: (args) => {
+    return (
+      <div
+        style={{
+          display: "flex",
+          gap: "3rem",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Button {...args} size="small">
+          Button(sm)
+        </Button>
+        <Button {...args} size="medium">
+          Button(m)
+        </Button>
+        <Button {...args} size="large">
+          Button(lg)
+        </Button>
+      </div>
+    );
+  },
   decorators: [
     (Story) => {
       return (
         <div
           style={{
             display: "flex",
-            gap: "1rem",
+            gap: "3rem",
             alignItems: "center",
             justifyContent: "center",
           }}
@@ -34,30 +69,18 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
   args: {
-    children: <span>text</span>,
+    buttonType: "primary",
   },
-  argTypes: {
-    size: {
-      control: false,
-    },
-    children: {
-      control: false,
-    },
-    asChild: {
-      control: false,
-    },
+};
+
+export const Secondary: Story = {
+  args: {
+    buttonType: "secondary",
   },
-  render: (args) => (
-    <>
-      <Button {...args} size="small">
-        Button
-      </Button>
-      <Button {...args} size="medium">
-        Button
-      </Button>
-      <Button {...args} size="large">
-        Button
-      </Button>
-    </>
-  ),
+};
+
+export const Danger: Story = {
+  args: {
+    buttonType: "danger",
+  },
 };
