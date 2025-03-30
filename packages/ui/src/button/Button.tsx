@@ -9,6 +9,7 @@ export interface ButtonProps
   buttonType?: "primary" | "secondary" | "danger";
   loading?: boolean;
   loadingText?: string;
+  rounded?: boolean;
   /** if set true, renders a child element and passes props to the child. */
   asChild?: boolean;
   spinnerPlacement?: "left" | "right";
@@ -19,15 +20,21 @@ export interface ButtonProps
 const Button = ({
   asChild = false,
   size = "medium",
+  rounded = false,
   children,
   ...buttonProps
 }: ButtonProps) => {
   const Comp = asChild ? Slot : "button";
 
   const sizeCss = getSizeCss(size);
+  const roundCss = rounded ? roundedCss : null;
 
   return (
-    <Comp css={[containerCss, sizeCss]} type="button" {...buttonProps}>
+    <Comp
+      css={[containerCss, sizeCss, roundCss]}
+      type="button"
+      {...buttonProps}
+    >
       {children}
     </Comp>
   );
@@ -68,6 +75,10 @@ const mediumSizeCss = css`
 
 const largeSizeCss = css`
   height: 3rem;
+`;
+
+const roundedCss = css`
+  border-radius: 6rem;
 `;
 
 export default Button;
