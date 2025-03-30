@@ -7,9 +7,9 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   size?: "small" | "medium" | "large";
   buttonType?: "primary" | "secondary" | "danger";
+  rounded?: boolean;
   loading?: boolean;
   loadingText?: string;
-  rounded?: boolean;
   /** if set true, renders a child element and passes props to the child. */
   asChild?: boolean;
   spinnerPlacement?: "left" | "right";
@@ -20,8 +20,8 @@ export interface ButtonProps
 const Button = ({
   asChild = false,
   size = "medium",
-  rounded = false,
   buttonType = "primary",
+  rounded = false,
   children,
   ...buttonProps
 }: ButtonProps) => {
