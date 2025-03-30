@@ -1,23 +1,30 @@
 import { css, keyframes } from "@emotion/react";
 
 export interface SpinnerProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLSpanElement>, "children"> {}
+  extends Omit<React.ButtonHTMLAttributes<HTMLSpanElement>, "children"> {
+  size?: "small" | "medium" | "large";
+}
 
-const Spinner = (props: SpinnerProps) => {
+const Spinner = ({ size = "small", ...spanProps }: SpinnerProps) => {
+  const sizeCss = getSizeCss(size);
   return (
-    <span css={wrapperCss} {...props}>
+    <span css={[wrapperCss, sizeCss]} {...spanProps}>
       <svg css={spinnerCss} viewBox="22 22 44 44">
-        <circle
-          cx="44"
-          cy="44"
-          r="20.2"
-          fill="none"
-          stroke-width="3.6"
-        ></circle>
+        <circle cx="44" cy="44" r="20" fill="none" stroke-width="3.6"></circle>
       </svg>
     </span>
   );
 };
+
+function getSizeCss(
+  size: Exclude<SpinnerProps["size"], undefined>,
+): ReturnType<typeof css> {
+  return {
+    small: smallCss,
+    medium: mediumCss,
+    large: largeCss,
+  }[size];
+}
 
 const spinAnimation = keyframes`
   0% {
@@ -44,10 +51,23 @@ const rotateAnimation = keyframes`
   }
 `;
 
+const largeCss = css`
+  width: 20px;
+  height: 20px;
+`;
+
+const mediumCss = css`
+  width: 16px;
+  height: 16px;
+`;
+
+const smallCss = css`
+  width: 12px;
+  height: 12px;
+`;
+
 const wrapperCss = css`
   display: inline-block;
-  width: 40px;
-  height: 40px;
   animation: ${rotateAnimation} 1.4s linear infinite;
 `;
 
