@@ -7,14 +7,13 @@ import Spinner, { SpinnerProps } from "../spinner/spinner";
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  asChild?: boolean;
   size?: "small" | "medium" | "large";
   buttonType?: "primary" | "secondary" | "danger";
   rounded?: boolean;
   loading?: boolean;
-  loadingText?: string;
-  /** if set true, renders a child element and passes props to the child. */
-  asChild?: boolean;
   loadingPlacement?: "left" | "right";
+  /** if set true, renders a child element and passes props to the child. */
   startIcon?: React.ReactNode;
   endIcon?: React.ReactNode;
 }
@@ -26,6 +25,7 @@ const Button = ({
   rounded = false,
   loading = false,
   loadingPlacement = "left",
+  disabled = false,
   children,
   ...buttonProps
 }: ButtonProps) => {
@@ -37,10 +37,13 @@ const Button = ({
 
   const spinnerSize = getSpinnerSize(size);
 
+  const isDisabled = disabled || loading;
+
   return (
     <Comp
       css={[containerCss, sizeCss.button, roundCss, buttonTypeCss]}
       type="button"
+      disabled={isDisabled}
       {...buttonProps}
     >
       {loadingPlacement === "left" && loading && (
@@ -95,6 +98,12 @@ const containerCss = css`
   cursor: pointer;
 
   transition: all 0.13s ease-in-out;
+
+  :disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    user-select: none;
+  }
 `;
 
 const smallButtonSizeCss = css`
@@ -132,7 +141,7 @@ const primaryCss = css`
   background-color: #171717;
   color: #ffffff;
 
-  :hover {
+  :hover:not(:disabled) {
     opacity: 0.8;
   }
 `;
@@ -141,7 +150,7 @@ const secondaryCss = css`
   color: #171717;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
 
-  :hover {
+  :hover:not(:disabled) {
     background-color: rgba(240, 240, 240, 1);
   }
 `;
@@ -149,7 +158,7 @@ const dangerCss = css`
   background-color: #dc2626;
   color: #ffffff;
 
-  :hover {
+  :hover:not(:disabled) {
     background-color: #e16160;
   }
 `;
