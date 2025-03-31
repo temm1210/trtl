@@ -14,8 +14,8 @@ export interface ButtonProps
   loading?: boolean;
   loadingPlacement?: "left" | "right";
   /** if set true, renders a child element and passes props to the child. */
-  startIcon?: React.ReactNode;
-  endIcon?: React.ReactNode;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
 }
 
 const Button = ({
@@ -26,6 +26,8 @@ const Button = ({
   loading = false,
   loadingPlacement = "left",
   disabled = false,
+  leftIcon,
+  rightIcon,
   children,
   ...buttonProps
 }: ButtonProps) => {
@@ -46,14 +48,33 @@ const Button = ({
       disabled={isDisabled}
       {...buttonProps}
     >
-      {loadingPlacement === "left" && loading && (
-        <Spinner size={spinnerSize} style={{ marginRight: "0.375rem" }} />
-      )}
+      {loadingPlacement === "left" && loading ? (
+        <Spinner size={spinnerSize} />
+      ) : leftIcon ? (
+        <IconWrapper css={sizeCss.icon} icon={leftIcon} />
+      ) : null}
+
       <span css={[textCss, sizeCss.text]}>{children}</span>
-      {loadingPlacement === "right" && loading && (
-        <Spinner size={spinnerSize} style={{ marginLeft: "0.375rem" }} />
-      )}
+
+      {loadingPlacement === "right" && loading ? (
+        <Spinner size={spinnerSize} />
+      ) : rightIcon ? (
+        <IconWrapper css={sizeCss.icon} icon={rightIcon} />
+      ) : null}
     </Comp>
+  );
+};
+
+interface IconWrapperProps {
+  icon: React.ReactNode;
+  className?: string;
+}
+
+const IconWrapper = ({ icon, className }: IconWrapperProps) => {
+  return (
+    <span className={className} css={iconContainerCss}>
+      {icon}
+    </span>
   );
 };
 
@@ -62,7 +83,7 @@ function getSpinnerSize(
 ): Exclude<SpinnerProps["size"], undefined> {
   const map = {
     small: "small",
-    medium: "medium",
+    medium: "small",
     large: "medium",
   } as const;
 
@@ -81,9 +102,21 @@ function getButtonTypeCss(
 
 function getSizeCss(size: Exclude<ButtonProps["size"], undefined>) {
   return {
-    small: { button: smallButtonSizeCss, text: smallTextSizeCss },
-    medium: { button: mediumButtonSizeCss, text: mediumTextSizeCss },
-    large: { button: largeButtonSizeCss, text: largeTextSizeCss },
+    small: {
+      button: smallButtonSizeCss,
+      text: smallTextSizeCss,
+      icon: smallIconCss,
+    },
+    medium: {
+      button: mediumButtonSizeCss,
+      text: mediumTextSizeCss,
+      icon: mediumIconCss,
+    },
+    large: {
+      button: largeButtonSizeCss,
+      text: largeTextSizeCss,
+      icon: largeIconCss,
+    },
   }[size];
 }
 
@@ -164,7 +197,24 @@ const dangerCss = css`
 `;
 
 const textCss = css`
-  padding: 0 0.375rem;
+  display: inline-block;
+  padding: 0 0.25rem;
+`;
+
+const iconContainerCss = css`
+  line-height: 0;
+`;
+
+const smallIconCss = css`
+  font-size: 1rem;
+`;
+
+const mediumIconCss = css`
+  font-size: 1.25rem;
+`;
+
+const largeIconCss = css`
+  font-size: 1.375rem;
 `;
 
 export default Button;
