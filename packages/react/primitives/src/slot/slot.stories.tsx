@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import Slot from "./slot";
+import { Slot, Slottable } from "./slot";
 
 const meta: Meta<typeof Slot> = {
   title: "Primitives/Slot",
@@ -28,6 +28,21 @@ export const Base: Story = {
         >
           Slot
         </button>
+      </Slot>
+    );
+  },
+};
+
+export const WithSlottable: Story = {
+  args: {},
+  render: () => {
+    return (
+      <Slot>
+        <div>💻</div>
+        <Slottable>
+          <a>link</a>
+        </Slottable>
+        <div>✌️</div>
       </Slot>
     );
   },

@@ -1,9 +1,13 @@
 import { render } from "@rtl/react-utils";
 
-import Slot from "./slot";
+import { Slot } from "./slot";
 
 const serialize = (html: string) =>
-  html.replace(/>\s+</g, "><").replace(/\s+/g, " ").trim();
+  html
+    .replace(/>\s+</g, "><")
+    .replace(/(?<=[>])\s+(?=[^<])/g, "")
+    .replace(/(?<=[^>])\s+(?=[<])/g, "")
+    .trim();
 
 describe("Slot tests", () => {
   test("render child correctly", async () => {
@@ -100,7 +104,7 @@ describe("Slot tests", () => {
     expect(slotRef).toHaveBeenCalledTimes(1);
   });
 
-  test("throw error if slot has more than one child", () => {
+  test("throw error if slot has more than one child when without Slottable", () => {
     const Component = () => {
       return (
         <Slot>
