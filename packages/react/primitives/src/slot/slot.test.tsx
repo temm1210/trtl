@@ -1,6 +1,6 @@
 import { render } from "@rtl/react-utils";
 
-import { Slot } from "./slot";
+import { Slot, Slottable } from "./slot";
 
 const serialize = (html: string) =>
   html
@@ -33,9 +33,7 @@ describe("Slot tests", () => {
         </div>
     `;
 
-    expect(dom.container.innerHTML).toMatchInlineSnapshot(
-      `"${serialize(result)}"`,
-    );
+    expect(dom.container.innerHTML).toMatchInlineSnapshot(`"${serialize(result)}"`);
   });
 
   test("pass slot props to its chid and merge it", async () => {
@@ -49,11 +47,7 @@ describe("Slot tests", () => {
         style={{ color: "red" }}
         onClick={handleSlotClick}
       >
-        <p
-          className="child"
-          style={{ backgroundColor: "red" }}
-          onClick={handleSlotChildClick}
-        >
+        <p className="child" style={{ backgroundColor: "red" }} onClick={handleSlotChildClick}>
           <span>span</span>
         </p>
       </Slot>,
@@ -101,5 +95,27 @@ describe("Slot tests", () => {
         </Slot>,
       ),
     ).toThrowError("Slot must have exactly one child");
+  });
+
+  test("render correctly when with Slottable", () => {
+    const { container } = render(
+      <Slot>
+        <div>div1</div>
+        <Slottable>
+          <a>link</a>
+        </Slottable>
+        <div>div2</div>
+      </Slot>,
+    );
+
+    const result = `
+        <a>
+          <div>div1</div>
+          link
+          <div>div2</div>
+        </a>
+    `;
+
+    expect(container.innerHTML).toMatchInlineSnapshot(`"${serialize(result)}"`);
   });
 });
