@@ -137,6 +137,16 @@ export const WithIcon: Story = {
   },
 };
 
+export const Slot: Story = {
+  render: () => {
+    return (
+      <Button asChild>
+        <a href="#">link</a>
+      </Button>
+    );
+  },
+};
+
 function ArrowUpOutline(props: SVGProps<SVGSVGElement>) {
   return (
     <svg

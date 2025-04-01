@@ -115,6 +115,18 @@ blockquote,
 q {
   quotes: none;
 }
+
+a {
+  color: #fff;
+  text-decoration: none;
+  outline: none;
+}
+a:hover,
+a:active {
+  text-decoration: none;
+  color: #fff;
+}
+
 blockquote:before,
 blockquote:after,
 q:before,

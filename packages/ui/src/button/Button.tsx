@@ -54,6 +54,7 @@ const Button = ({
         <IconWrapper css={sizeCss.icon} icon={leftIcon} />
       ) : null}
 
+      {children}
       <span css={[textCss, sizeCss.text]}>{children}</span>
 
       {loadingPlacement === "right" && loading ? (
