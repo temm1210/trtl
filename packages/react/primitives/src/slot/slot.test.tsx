@@ -36,7 +36,7 @@ describe("Slot tests", () => {
     expect(dom.container.innerHTML).toMatchInlineSnapshot(`"${serialize(result)}"`);
   });
 
-  test("pass slot props to its chid and merge it", async () => {
+  test("pass Slot props to its chid and merge it", async () => {
     const handleSlotClick = vi.fn(() => "slot");
     const handleSlotChildClick = vi.fn(() => "slot child");
 
@@ -72,7 +72,7 @@ describe("Slot tests", () => {
     expect(handleSlotChildClick).toReturnWith("slot child");
   });
 
-  test("merge slot ref and child ref", () => {
+  test("merge Slot ref and child ref", () => {
     const slotRef = vi.fn();
     const childRef = vi.fn();
 
@@ -86,7 +86,17 @@ describe("Slot tests", () => {
     expect(slotRef).toHaveBeenCalledTimes(1);
   });
 
-  test("throw error if slot has more than one child when without Slottable", () => {
+  test("Slottable renders children correctly", () => {
+    const { getByTestId } = render(
+      <Slottable>
+        <span data-testid="slottable-child">slottable</span>
+      </Slottable>,
+    );
+
+    expect(getByTestId("slottable-child")).toBeTruthy();
+  });
+
+  test("throw error if Slot has more than one child when without Slottable", () => {
     expect(() =>
       render(
         <Slot>
