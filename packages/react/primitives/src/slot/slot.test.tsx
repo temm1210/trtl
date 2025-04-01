@@ -11,21 +11,17 @@ const serialize = (html: string) =>
 
 describe("Slot tests", () => {
   test("render child correctly", async () => {
-    const Component = () => {
-      return (
-        <div className="container">
-          <Slot className="slot" id="slot">
-            <div className="child" id="child">
-              <span>span</span>
-              <p>p</p>
-              <strong>strong</strong>
-            </div>
-          </Slot>
-        </div>
-      );
-    };
-
-    const dom = render(<Component />);
+    const dom = render(
+      <div className="container">
+        <Slot className="slot" id="slot">
+          <div className="child" id="child">
+            <span>span</span>
+            <p>p</p>
+            <strong>strong</strong>
+          </div>
+        </Slot>
+      </div>,
+    );
 
     const result = `
         <div class="container">
@@ -46,32 +42,28 @@ describe("Slot tests", () => {
     const handleSlotClick = vi.fn(() => "slot");
     const handleSlotChildClick = vi.fn(() => "slot child");
 
-    const Component = () => {
-      return (
-        <Slot
-          data-testid="slot-test-id"
-          className="slot"
-          style={{ color: "red" }}
-          onClick={handleSlotClick}
+    const { container, userEvent, getByTestId } = render(
+      <Slot
+        data-testid="slot-test-id"
+        className="slot"
+        style={{ color: "red" }}
+        onClick={handleSlotClick}
+      >
+        <p
+          className="child"
+          style={{ backgroundColor: "red" }}
+          onClick={handleSlotChildClick}
         >
-          <p
-            className="child"
-            style={{ backgroundColor: "red" }}
-            onClick={handleSlotChildClick}
-          >
-            <span>span</span>
-          </p>
-        </Slot>
-      );
-    };
+          <span>span</span>
+        </p>
+      </Slot>,
+    );
 
     const result = `
         <p class="slot child" style="color: red; background-color: red;" data-testid="slot-test-id">
             <span>span</span>
         </p>
     `;
-
-    const { container, userEvent, getByTestId } = render(<Component />);
 
     expect(handleSlotClick).toHaveBeenCalledTimes(0);
     expect(handleSlotChildClick).toHaveBeenCalledTimes(0);
@@ -90,32 +82,24 @@ describe("Slot tests", () => {
     const slotRef = vi.fn();
     const childRef = vi.fn();
 
-    const Component = () => {
-      return (
-        <Slot ref={slotRef}>
-          <div ref={childRef} />
-        </Slot>
-      );
-    };
-
-    render(<Component />);
+    render(
+      <Slot ref={slotRef}>
+        <div ref={childRef} />
+      </Slot>,
+    );
 
     expect(childRef).toHaveBeenCalledTimes(1);
     expect(slotRef).toHaveBeenCalledTimes(1);
   });
 
   test("throw error if slot has more than one child when without Slottable", () => {
-    const Component = () => {
-      return (
+    expect(() =>
+      render(
         <Slot>
           <div />
           <div />
-        </Slot>
-      );
-    };
-
-    expect(() => render(<Component />)).toThrowError(
-      "Slot must have exactly one child",
-    );
+        </Slot>,
+      ),
+    ).toThrowError("Slot must have exactly one child");
   });
 });
