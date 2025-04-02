@@ -152,4 +152,31 @@ describe("Slot tests", () => {
       ),
     ).toThrowError("Slottable must be one");
   });
+
+  test("merge Slottable child ref and slot ref", () => {
+    const slotRefMock = { current: null as HTMLElement | null };
+    const slottableChildRefMock = { current: null as HTMLAnchorElement | null };
+
+    const Component = () => {
+      return (
+        <Slot ref={slotRefMock}>
+          <div>div1</div>
+          <Slottable>
+            <a data-testid="slottable-child" ref={slottableChildRefMock}>
+              link
+            </a>
+          </Slottable>
+          <div>div2</div>
+        </Slot>
+      );
+    };
+
+    const { getByTestId } = render(<Component />);
+
+    expect(slotRefMock.current?.tagName).toBe("A");
+    expect(getByTestId("slottable-child")).toBe(slotRefMock.current);
+
+    expect(slottableChildRefMock.current?.tagName).toBe("A");
+    expect(getByTestId("slottable-child")).toBe(slottableChildRefMock.current);
+  });
 });
