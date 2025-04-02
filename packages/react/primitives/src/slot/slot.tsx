@@ -29,35 +29,38 @@ const Slot = ({ children, ...slotProps }: SlotProps) => {
 
     const nextSlottableChildren = childrenAsArray.map((child) => {
       if (child === slottableElement) {
-        return (slottableChildren.props as { children: React.ReactNode })
-          .children;
+        return (slottableChildren.props as { children: React.ReactNode }).children;
       } else {
         return child;
       }
     });
 
-    const child = slottableChildren as React.ReactElement<
-      React.ComponentProps<typeof Slottable>,
-      typeof Slottable
-    >;
-
-    const props = mergeProps(slotProps, child.props);
-
-    const childRef = (child.props as React.RefAttributes<any>).ref;
-    const slotRef = slotProps.ref;
-
-    if (childRef || slotRef) {
-      props.ref = mergeRefs([childRef, slotRef]);
-    }
-
-    return React.cloneElement(slottableChildren, props, nextSlottableChildren);
+    return (
+      <SlotCloneElement {...slotProps}>
+        {React.cloneElement(slottableChildren, undefined, nextSlottableChildren)}
+      </SlotCloneElement>
+    );
   }
 
   if (childrenAsArray.length !== 1) {
     throw Error("Slot must have exactly one child");
   }
 
-  const child = childrenAsArray[0] as React.ReactElement<HTMLElement>;
+  return (
+    <SlotCloneElement {...slotProps}>
+      {childrenAsArray[0] as React.ReactElement<HTMLElement>}
+    </SlotCloneElement>
+  );
+};
+
+// ****************** SlotCloneElement ***************************
+interface SlotCloneElementProps extends React.HTMLAttributes<HTMLElement> {
+  children: React.ReactElement;
+  ref?: React.Ref<HTMLElement>;
+}
+
+const SlotCloneElement = ({ children, ...slotProps }: SlotCloneElementProps) => {
+  const child = React.Children.only(children) as React.ReactElement<HTMLElement>;
 
   const props = mergeProps(slotProps, child.props);
 
@@ -68,18 +71,15 @@ const Slot = ({ children, ...slotProps }: SlotProps) => {
     props.ref = mergeRefs([childRef, slotRef]);
   }
 
-  return React.cloneElement(child, props);
+  return React.cloneElement(children, props);
 };
 
-// /****************** Slottable ***************************/
+// ****************** Slottable ***************************
 const Slottable = ({ children }: { children: React.ReactElement }) => {
-  return <>{children}</>;
+  return children;
 };
 
-function mergeProps(
-  slotProps: Record<string, any>,
-  childProps: Record<string, any>,
-) {
+function mergeProps(slotProps: Record<string, any>, childProps: Record<string, any>) {
   const mergedProps: Record<string, any> = { ...slotProps, ...childProps };
 
   Object.keys(mergedProps)
@@ -96,9 +96,7 @@ function mergeProps(
   }
 
   if (slotProps.className) {
-    mergedProps.className = [slotProps.className, childProps.className].join(
-      " ",
-    );
+    mergedProps.className = [slotProps.className, childProps.className].join(" ");
   }
 
   return mergedProps;

@@ -5,8 +5,7 @@ import { Slot } from "@rtl/react-primitives";
 
 import Spinner, { SpinnerProps } from "../spinner/spinner";
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
   size?: "small" | "medium" | "large";
   buttonType?: "primary" | "secondary" | "danger";
@@ -54,7 +53,6 @@ const Button = ({
         <IconWrapper css={sizeCss.icon} icon={leftIcon} />
       ) : null}
 
-      {children}
       <span css={[textCss, sizeCss.text]}>{children}</span>
 
       {loadingPlacement === "right" && loading ? (
@@ -91,9 +89,7 @@ function getSpinnerSize(
   return map[size];
 }
 
-function getButtonTypeCss(
-  buttonType: Exclude<ButtonProps["buttonType"], undefined>,
-) {
+function getButtonTypeCss(buttonType: Exclude<ButtonProps["buttonType"], undefined>) {
   return {
     primary: primaryCss,
     secondary: secondaryCss,

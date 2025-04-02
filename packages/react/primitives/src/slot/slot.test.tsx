@@ -114,17 +114,19 @@ describe("Slot tests", () => {
 
   test("render correctly when with Slottable", () => {
     const { container } = render(
-      <Slot>
+      <Slot className="slot" style={{ color: "black" }}>
         <div>div1</div>
         <Slottable>
-          <a>link</a>
+          <a className="slottable" style={{ backgroundColor: "red" }}>
+            link
+          </a>
         </Slottable>
         <div>div2</div>
       </Slot>,
     );
 
     const result = `
-        <a>
+        <a class="slot slottable" style="color: black; background-color: red;">
           <div>div1</div>
           link
           <div>div2</div>
