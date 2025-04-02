@@ -128,4 +128,23 @@ describe("Slot tests", () => {
 
     expect(container.innerHTML).toMatchInlineSnapshot(`"${serialize(result)}"`);
   });
+
+  test("throw error if slot has more than one Slottable", () => {
+    expect(() =>
+      render(
+        <Slot>
+          <div>div1</div>
+          <Slottable>
+            <a>
+              <div>link</div>
+            </a>
+          </Slottable>
+          <Slottable>
+            <span>slottable</span>
+          </Slottable>
+          <div>div2</div>
+        </Slot>,
+      ),
+    ).toThrowError("Slottable must be one");
+  });
 });
