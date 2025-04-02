@@ -73,17 +73,22 @@ describe("Slot tests", () => {
   });
 
   test("merge Slot ref and child ref", () => {
-    const slotRef = vi.fn();
-    const childRef = vi.fn();
+    const slotRef = { current: null as HTMLElement | null };
+    const childRef = { current: null as HTMLAnchorElement | null };
 
-    render(
+    const { getByTestId } = render(
       <Slot ref={slotRef}>
-        <div ref={childRef} />
+        <a data-testid="slot-child" ref={childRef}>
+          link
+        </a>
       </Slot>,
     );
 
-    expect(childRef).toHaveBeenCalledTimes(1);
-    expect(slotRef).toHaveBeenCalledTimes(1);
+    expect(slotRef.current?.tagName).toBe("A");
+    expect(getByTestId("slot-child")).toBe(slotRef.current);
+
+    expect(childRef.current?.tagName).toBe("A");
+    expect(getByTestId("slot-child")).toBe(childRef.current);
   });
 
   test("Slottable renders children correctly", () => {
