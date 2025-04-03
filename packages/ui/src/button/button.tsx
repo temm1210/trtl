@@ -1,7 +1,7 @@
 import React from "react";
 
 import { css } from "@emotion/react";
-import { Slot } from "@rtl/react-primitives";
+import { Slot, Slottable } from "@rtl/react-primitives";
 
 import Spinner, { SpinnerProps } from "../spinner/spinner";
 
@@ -53,7 +53,17 @@ const Button = ({
         <IconWrapper css={sizeCss.icon} icon={leftIcon} />
       ) : null}
 
-      <span css={[textCss, sizeCss.text]}>{children}</span>
+      {asChild && React.isValidElement(children) ? (
+        <Slottable>
+          {React.cloneElement(
+            children,
+            undefined,
+            <span css={[textCss, sizeCss.text]}>{children}</span>,
+          )}
+        </Slottable>
+      ) : (
+        <span css={[textCss, sizeCss.text]}>{children}</span>
+      )}
 
       {loadingPlacement === "right" && loading ? (
         <Spinner size={spinnerSize} />
@@ -195,7 +205,7 @@ const dangerCss = css`
 
 const textCss = css`
   display: inline-block;
-  padding: 0 0.25rem;
+  padding: 0 0.5rem;
 `;
 
 const iconContainerCss = css`

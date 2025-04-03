@@ -86,13 +86,7 @@ export const Loading: Story = {
         <Button buttonType="primary" size="medium" loading {...args}>
           Primary
         </Button>
-        <Button
-          buttonType="secondary"
-          size="medium"
-          loading
-          loadingPlacement="right"
-          {...args}
-        >
+        <Button buttonType="secondary" size="medium" loading loadingPlacement="right" {...args}>
           Secondary
         </Button>
         <Button buttonType="danger" size="medium" loading {...args}>
@@ -107,20 +101,10 @@ export const WithIcon: Story = {
   render: (args) => {
     return (
       <>
-        <Button
-          buttonType="primary"
-          size="small"
-          leftIcon={<DownloadSolidSvg />}
-          {...args}
-        >
+        <Button buttonType="primary" size="small" leftIcon={<DownloadSolidSvg />} {...args}>
           Primary
         </Button>
-        <Button
-          buttonType="secondary"
-          size="medium"
-          rightIcon={<DownloadSolidSvg />}
-          {...args}
-        >
+        <Button buttonType="secondary" size="medium" rightIcon={<DownloadSolidSvg />} {...args}>
           Secondary
         </Button>
         <Button
@@ -140,7 +124,7 @@ export const WithIcon: Story = {
 export const Slot: Story = {
   render: () => {
     return (
-      <Button asChild>
+      <Button asChild loading>
         <a href="#">link</a>
       </Button>
     );
@@ -149,13 +133,7 @@ export const Slot: Story = {
 
 function ArrowUpOutline(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      width="1em"
-      height="1em"
-      {...props}
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" {...props}>
       <path
         fill="currentColor"
         fillRule="evenodd"
@@ -174,13 +152,7 @@ function ArrowUpOutline(props: SVGProps<SVGSVGElement>) {
 
 function DownloadSolidSvg(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      width="1em"
-      height="1em"
-      {...props}
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" {...props}>
       <path
         fill="currentColor"
         fillRule="evenodd"
