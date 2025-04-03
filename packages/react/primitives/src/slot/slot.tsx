@@ -25,7 +25,7 @@ const Slot = ({ children, ...slotProps }: SlotProps) => {
       typeof Slottable
     >;
 
-    const slottableChildren = slottableElement.props.children;
+    const slottableChildren = slottableElement.props.children as React.ReactElement;
 
     const nextSlottableChildren = childrenAsArray.map((child) => {
       if (child === slottableElement) {
@@ -75,7 +75,7 @@ const SlotCloneElement = ({ children, ...slotProps }: SlotCloneElementProps) => 
 };
 
 // ****************** Slottable ***************************
-const Slottable = ({ children }: { children: React.ReactElement }) => {
+const Slottable = ({ children }: { children: React.ReactNode }) => {
   return children;
 };
 
