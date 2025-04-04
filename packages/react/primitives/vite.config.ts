@@ -9,10 +9,10 @@ export default mergeConfig(
   configShared,
   defineConfig({
     plugins: [react()],
-    test: {
+    resolve: {
       alias: {
         "@": path.resolve(__dirname, "src"),
       },
     },
-  })
+  }),
 );

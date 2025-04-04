@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { Slot, Slottable } from "./slot";
+import { Slot, Slottable } from "@/slot";
 
 const meta: Meta<typeof Slot> = {
   title: "Primitives/Slot",
@@ -18,14 +18,8 @@ export const Base: Story = {
   args: {},
   render: () => {
     return (
-      <Slot
-        className="slot classname"
-        onClick={() => console.log("slot clicked")}
-      >
-        <button
-          className="child classname"
-          onClick={() => console.log("child clicked")}
-        >
+      <Slot className="slot classname" onClick={() => console.log("slot clicked")}>
+        <button className="child classname" onClick={() => console.log("child clicked")}>
           Slot
         </button>
       </Slot>

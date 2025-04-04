@@ -3,7 +3,7 @@ import React from "react";
 import { css } from "@emotion/react";
 import { Slot, Slottable } from "@rtl/react-primitives";
 
-import Spinner, { SpinnerProps } from "../spinner/spinner";
+import Spinner, { SpinnerProps } from "@/spinner";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
