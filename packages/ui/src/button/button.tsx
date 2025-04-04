@@ -30,21 +30,39 @@ const Button = ({
   children,
   ...buttonProps
 }: ButtonProps) => {
-  const Comp = asChild ? Slot : "button";
-
   const sizeCss = getSizeCss(size);
+  const spinnerSize = getSpinnerSize(size);
+
   const buttonTypeCss = getButtonTypeCss(buttonType);
   const roundCss = rounded ? roundedCss : null;
 
-  const spinnerSize = getSpinnerSize(size);
-
   const isDisabled = disabled || loading;
 
+  const Comp =
+    asChild && React.isValidElement<{ children: React.ReactNode }>(children)
+      ? {
+          Root: Slot,
+          Content: (
+            <Slottable>
+              {React.cloneElement(
+                children,
+                undefined,
+                <ButtonContent css={sizeCss.text}>{children.props.children}</ButtonContent>,
+              )}
+            </Slottable>
+          ),
+        }
+      : ({
+          Root: "button",
+          Content: <ButtonContent css={sizeCss.text}>{children}</ButtonContent>,
+        } as const);
+
   return (
-    <Comp
+    <Comp.Root
       css={[containerCss, sizeCss.button, roundCss, buttonTypeCss]}
       type="button"
       disabled={isDisabled}
+      data-disabled={isDisabled}
       {...buttonProps}
     >
       {loadingPlacement === "left" && loading ? (
@@ -53,24 +71,14 @@ const Button = ({
         <IconWrapper css={sizeCss.icon} icon={leftIcon} />
       ) : null}
 
-      {asChild && React.isValidElement(children) ? (
-        <Slottable>
-          {React.cloneElement(
-            children,
-            undefined,
-            <span css={[textCss, sizeCss.text]}>{children}</span>,
-          )}
-        </Slottable>
-      ) : (
-        <span css={[textCss, sizeCss.text]}>{children}</span>
-      )}
+      {Comp.Content}
 
       {loadingPlacement === "right" && loading ? (
         <Spinner size={spinnerSize} />
       ) : rightIcon ? (
         <IconWrapper css={sizeCss.icon} icon={rightIcon} />
       ) : null}
-    </Comp>
+    </Comp.Root>
   );
 };
 
@@ -83,6 +91,19 @@ const IconWrapper = ({ icon, className }: IconWrapperProps) => {
   return (
     <span className={className} css={iconContainerCss}>
       {icon}
+    </span>
+  );
+};
+
+interface ButtonContentProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+const ButtonContent = ({ children, className }: ButtonContentProps) => {
+  return (
+    <span className={className} css={textCss}>
+      {children}
     </span>
   );
 };
@@ -137,12 +158,16 @@ const containerCss = css`
   border: 1px solid transparent;
   cursor: pointer;
 
+  width: 100%;
+  height: 100%;
   transition: all 0.13s ease-in-out;
 
-  :disabled {
+  &[data-disabled="true"],
+  &:disabled {
     cursor: not-allowed;
     opacity: 0.5;
     user-select: none;
+    position: relative;
   }
 `;
 
@@ -181,8 +206,10 @@ const primaryCss = css`
   background-color: #171717;
   color: #ffffff;
 
-  :hover:not(:disabled) {
-    opacity: 0.8;
+  &[data-disabled="false"] {
+    &:hover {
+      opacity: 0.8;
+    }
   }
 `;
 const secondaryCss = css`
@@ -190,16 +217,20 @@ const secondaryCss = css`
   color: #171717;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
 
-  :hover:not(:disabled) {
-    background-color: rgba(240, 240, 240, 1);
+  &[data-disabled="false"] {
+    &:hover {
+      background-color: rgba(240, 240, 240, 1);
+    }
   }
 `;
 const dangerCss = css`
   background-color: #dc2626;
   color: #ffffff;
 
-  :hover:not(:disabled) {
-    background-color: #e16160;
+  &[data-disabled="false"] {
+    &:hover {
+      background-color: #e16160;
+    }
   }
 `;
 

@@ -34,6 +34,9 @@ const meta: Meta<typeof Button> = {
     rightIcon: {
       control: false,
     },
+    disabled: {
+      control: "boolean",
+    },
   },
   decorators: [
     (Story) => {
@@ -122,10 +125,18 @@ export const WithIcon: Story = {
 };
 
 export const Slot: Story = {
-  render: () => {
+  render: (args) => {
     return (
-      <Button asChild loading>
-        <a href="#">link</a>
+      <Button className="test" asChild {...args} onClick={() => console.log("slot")}>
+        <a
+          href="1"
+          onClick={(e) => {
+            e.preventDefault();
+            console.log("a");
+          }}
+        >
+          link
+        </a>
       </Button>
     );
   },
