@@ -5,15 +5,11 @@ const project = resolve(process.cwd(), "tsconfig.json");
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
   plugins: ["unused-imports"],
-  extends: [
-    "eslint:recommended",
-    "plugin:import/recommended",
-    "prettier",
-    "turbo",
-  ],
+  extends: ["eslint:recommended", "plugin:import/recommended", "prettier", "turbo"],
   globals: {
     React: true,
     JSX: true,
+    vi: true,
   },
   env: {
     node: true,
@@ -40,13 +36,7 @@ module.exports = {
       "error",
       {
         "newlines-between": "always",
-        groups: [
-          "builtin",
-          "external",
-          "internal",
-          ["sibling", "parent"],
-          "unknown",
-        ],
+        groups: ["builtin", "external", "internal", ["sibling", "parent"], "unknown"],
         pathGroups: [
           { pattern: "react", group: "builtin", position: "after" },
           { pattern: "react-dom", group: "builtin", position: "after" },
