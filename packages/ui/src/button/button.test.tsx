@@ -70,4 +70,30 @@ describe("Button tests", () => {
     expect(button).toBeDisabled();
     expect(handleClick).not.toHaveBeenCalled();
   });
+
+  test("render child instead of button when asChild is true", async () => {
+    const handleClickSlot = vi.fn();
+    const handleClickChild = vi.fn();
+
+    const { getByTestId, userEvent, container } = render(
+      <Button data-testid="slot" asChild onClick={handleClickSlot}>
+        <a href="/test" onClick={handleClickChild}>
+          link
+        </a>
+      </Button>,
+    );
+
+    expect(handleClickSlot).toHaveBeenCalledTimes(0);
+    expect(handleClickChild).toHaveBeenCalledTimes(0);
+
+    const button = getByTestId("slot");
+
+    await userEvent.click(button);
+
+    expect(handleClickSlot).toHaveBeenCalledTimes(1);
+    expect(handleClickChild).toHaveBeenCalledTimes(1);
+
+    expect(button).toHaveAttribute("href", "/test");
+    expect(container.firstElementChild?.tagName).toBe("A");
+  });
 });
