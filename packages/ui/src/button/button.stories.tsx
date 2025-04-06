@@ -124,15 +124,16 @@ export const WithIcon: Story = {
   },
 };
 
-export const Slot: Story = {
+export const SlotWithDisabled: Story = {
   render: (args) => {
     return (
-      <Button className="test" asChild {...args} onClick={() => console.log("slot")}>
+      <Button asChild {...args}>
         <a
-          href="1"
+          data-disabled="true"
+          href="#"
           onClick={(e) => {
             e.preventDefault();
-            console.log("a");
+            console.log("link clicked");
           }}
         >
           link
