@@ -1,7 +1,6 @@
 import { css, keyframes } from "@emotion/react";
 
-export interface SpinnerProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLSpanElement>, "children"> {
+export interface SpinnerProps extends Omit<React.ComponentPropsWithRef<"span">, "children"> {
   size?: "small" | "medium" | "large";
 }
 
@@ -16,9 +15,7 @@ const Spinner = ({ size = "small", ...spanProps }: SpinnerProps) => {
   );
 };
 
-function getSizeCss(
-  size: Exclude<SpinnerProps["size"], undefined>,
-): ReturnType<typeof css> {
+function getSizeCss(size: Exclude<SpinnerProps["size"], undefined>): ReturnType<typeof css> {
   return {
     small: smallCss,
     medium: mediumCss,

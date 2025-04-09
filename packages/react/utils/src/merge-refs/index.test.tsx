@@ -8,10 +8,7 @@ test("mergeRefs call with ref, null, undefined", async () => {
 
   const Component = () => {
     return (
-      <div
-        data-testid="merge-ref-test"
-        ref={mergeRefs([ref1, ref2, null, undefined])}
-      >
+      <div data-testid="merge-ref-test" ref={mergeRefs([ref1, ref2, null, undefined])}>
         test
       </div>
     );
@@ -20,9 +17,9 @@ test("mergeRefs call with ref, null, undefined", async () => {
   expect(ref1.current).toBe(undefined);
   expect(ref2).toHaveBeenCalledTimes(0);
 
-  const { findByTestId, unmount } = render(<Component />);
+  const { getByTestId, unmount } = render(<Component />);
 
-  const element = await findByTestId("merge-ref-test");
+  const element = await getByTestId("merge-ref-test");
 
   expect(ref1.current).toBe(element);
   expect(ref2).toHaveBeenCalledTimes(1);

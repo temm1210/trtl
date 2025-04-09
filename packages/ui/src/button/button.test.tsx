@@ -96,4 +96,14 @@ describe("Button tests", () => {
     expect(button).toHaveAttribute("href", "/test");
     expect(container.firstElementChild?.tagName).toBe("A");
   });
+
+  test("ref must be executed correctly", async () => {
+    const buttonRef = { current: null };
+
+    const { getByTestId } = render(<Button ref={buttonRef} data-testid="button"></Button>);
+
+    const button = getByTestId("button");
+
+    expect(buttonRef.current).toBe(button);
+  });
 });

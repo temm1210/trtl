@@ -5,7 +5,7 @@ import { Slot, Slottable } from "@rtl/react-primitives";
 
 import Spinner, { SpinnerProps } from "@/spinner";
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends React.ComponentPropsWithRef<"button"> {
   asChild?: boolean;
   size?: "small" | "medium" | "large";
   buttonType?: "primary" | "secondary" | "danger";
