@@ -1,14 +1,22 @@
+import { useState } from "react";
+
 import { css } from "@emotion/react";
 import { CheckIcon } from "@rtl/icons";
 
 export interface CheckboxProps extends React.ComponentPropsWithRef<"input"> {}
 
 const Checkbox = ({ children }: CheckboxProps) => {
+  const [isClicked, setIsClicked] = useState(false);
+
   return (
     <label css={labelCss}>
-      <input css={inputCss} />
+      <input
+        type="checkbox"
+        css={inputCss}
+        onChange={(e) => setIsClicked(e.currentTarget.checked)}
+      />
       <span css={iconWrapperCss}>
-        <CheckIcon />
+        <CheckIcon style={{ visibility: isClicked ? "visible" : "hidden" }} />
       </span>
       <span css={textWrapperCss}>{children}</span>
     </label>
@@ -44,11 +52,17 @@ const iconWrapperCss = css`
   border: 1px solid #e4e4e7;
   border-radius: 0.25rem;
   box-sizing: border-box;
+
+  input:focus-visible:not(:checked) + & {
+    outline: 2px solid #000;
+    outline-offset: 1px;
+  }
 `;
 
 const textWrapperCss = css`
   display: inline-block;
   padding-left: 0.625rem;
+  user-select: none;
 `;
 
 export default Checkbox;
