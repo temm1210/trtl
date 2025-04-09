@@ -1,6 +1,5 @@
 import { css } from "@emotion/react";
-
-import CheckIcon from "./checkIcon";
+import { CheckIcon } from "@rtl/icons";
 
 export interface CheckboxProps extends React.ComponentPropsWithRef<"input"> {}
 

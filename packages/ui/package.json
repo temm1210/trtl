@@ -12,10 +12,13 @@
     "build-storybook": "storybook build",
     "check-types": "tsc --noEmit"
   },
-  "devDependencies": {
-    "@rtl/eslint-config": "workspace:*",
-    "@rtl/typescript-config": "workspace:*",
+  "dependencies": {
+    "@rtl/icons": "workspace:*",
     "@rtl/react-primitives": "workspace:*",
     "@rtl/react-utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@rtl/eslint-config": "workspace:*",
+    "@rtl/typescript-config": "workspace:*"
   }
 }

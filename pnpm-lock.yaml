@@ -155,6 +155,15 @@ importers:
 
   packages/config/typescript: {}
 
+  packages/react/icons:
+    devDependencies:
+      '@rtl/eslint-config':
+        specifier: workspace:*
+        version: link:../../config/eslint
+      '@rtl/typescript-config':
+        specifier: workspace:*
+        version: link:../../config/typescript
+
   packages/react/primitives:
     devDependencies:
       '@rtl/eslint-config':
@@ -177,16 +186,20 @@ importers:
         version: link:../../config/typescript
 
   packages/ui:
-    devDependencies:
-      '@rtl/eslint-config':
+    dependencies:
+      '@rtl/icons':
         specifier: workspace:*
-        version: link:../config/eslint
+        version: link:../react/icons
       '@rtl/react-primitives':
         specifier: workspace:*
         version: link:../react/primitives
       '@rtl/react-utils':
         specifier: workspace:*
         version: link:../react/utils
+    devDependencies:
+      '@rtl/eslint-config':
+        specifier: workspace:*
+        version: link:../config/eslint
       '@rtl/typescript-config':
         specifier: workspace:*
         version: link:../config/typescript
