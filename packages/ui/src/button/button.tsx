@@ -38,27 +38,11 @@ const Button = ({
 
   const isDisabled = disabled || loading;
 
-  const Comp =
-    asChild && React.isValidElement<{ children: React.ReactNode }>(children)
-      ? {
-          Root: Slot,
-          Content: (
-            <Slottable>
-              {React.cloneElement(
-                children,
-                undefined,
-                <ButtonContent css={sizeCss.text}>{children.props.children}</ButtonContent>,
-              )}
-            </Slottable>
-          ),
-        }
-      : ({
-          Root: "button",
-          Content: <ButtonContent css={sizeCss.text}>{children}</ButtonContent>,
-        } as const);
+  const Comp = asChild ? Slot : "button";
+  const hasSlottable = asChild && React.isValidElement<{ children: React.ReactNode }>(children);
 
   return (
-    <Comp.Root
+    <Comp
       css={[containerCss, sizeCss.button, roundCss, buttonTypeCss]}
       type="button"
       disabled={isDisabled}
@@ -71,14 +55,24 @@ const Button = ({
         <IconWrapper css={sizeCss.icon} icon={leftIcon} />
       ) : null}
 
-      {Comp.Content}
+      {hasSlottable ? (
+        <Slottable>
+          {React.cloneElement(
+            children,
+            undefined,
+            <ButtonContent css={sizeCss.text}>{children.props.children}</ButtonContent>,
+          )}
+        </Slottable>
+      ) : (
+        <ButtonContent css={sizeCss.text}>{children}</ButtonContent>
+      )}
 
       {loadingPlacement === "right" && loading ? (
         <Spinner size={spinnerSize} />
       ) : rightIcon ? (
         <IconWrapper css={sizeCss.icon} icon={rightIcon} />
       ) : null}
-    </Comp.Root>
+    </Comp>
   );
 };
 

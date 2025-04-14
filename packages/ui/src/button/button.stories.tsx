@@ -132,7 +132,6 @@ export const SlotWithDisabled: Story = {
           href="#"
           onClick={(e) => {
             e.preventDefault();
-            console.log("link clicked");
           }}
         >
           link
