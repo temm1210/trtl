@@ -8,17 +8,21 @@ export interface CheckboxProps extends React.ComponentPropsWithRef<"input"> {}
 const Checkbox = ({ children }: CheckboxProps) => {
   const [isClicked, setIsClicked] = useState(false);
 
+  const dataState = isClicked ? "checked" : "unchecked";
+
   return (
-    <label css={labelCss}>
+    <label css={labelCss} data-state={dataState}>
       <input
         type="checkbox"
         css={inputCss}
         onChange={(e) => setIsClicked(e.currentTarget.checked)}
       />
-      <span css={iconWrapperCss}>
-        <CheckIcon style={{ visibility: isClicked ? "visible" : "hidden" }} />
+      <span css={iconWrapperCss} data-state={dataState}>
+        <CheckIcon style={{ visibility: isClicked ? "visible" : "hidden" }} css={iconCss} />
       </span>
-      <span css={textWrapperCss}>{children}</span>
+      <span css={textWrapperCss} data-state={dataState}>
+        {children}
+      </span>
     </label>
   );
 };
@@ -26,7 +30,6 @@ const Checkbox = ({ children }: CheckboxProps) => {
 const labelCss = css`
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   position: relative;
 `;
 
@@ -52,6 +55,13 @@ const iconWrapperCss = css`
   border: 1px solid #e4e4e7;
   border-radius: 0.25rem;
   box-sizing: border-box;
+  background-color: #ffffff;
+
+  transition: background-color 0.15s ease;
+
+  &[data-state="checked"] {
+    background-color: #18181b;
+  }
 
   input:focus-visible:not(:checked) + & {
     outline: 2px solid #000;
@@ -59,9 +69,15 @@ const iconWrapperCss = css`
   }
 `;
 
+const iconCss = css`
+  width: 0.875rem;
+  height: 0.875rem;
+  color: #ffffff;
+`;
+
 const textWrapperCss = css`
   display: inline-block;
-  padding-left: 0.625rem;
+  padding-left: 0.5rem;
   user-select: none;
 `;
 
