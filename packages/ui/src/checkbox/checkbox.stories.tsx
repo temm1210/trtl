@@ -15,6 +15,11 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Base: Story = {
+  argTypes: {
+    disabled: {
+      control: "boolean",
+    },
+  },
   render: (args) => {
     return <Checkbox {...args}>Checkbox</Checkbox>;
   },

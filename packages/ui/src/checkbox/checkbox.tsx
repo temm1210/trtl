@@ -3,26 +3,52 @@ import { useState } from "react";
 import { css } from "@emotion/react";
 import { CheckIcon } from "@rtl/icons";
 
-export interface CheckboxProps extends React.ComponentPropsWithRef<"input"> {}
+export interface CheckboxProps extends React.ComponentPropsWithRef<"input"> {
+  onCheckedChange?: (checked: boolean) => void;
+}
 
-const Checkbox = ({ children }: CheckboxProps) => {
-  const [isClicked, setIsClicked] = useState(false);
+const Checkbox = ({
+  children,
+  checked: checkedProp,
+  defaultChecked,
+  disabled,
+  onCheckedChange,
+  onChange,
+  ...inputProps
+}: CheckboxProps) => {
+  const [isClickedState, setIsClickedState] = useState(defaultChecked ?? false);
 
-  const dataState = isClicked ? "checked" : "unchecked";
+  const isControlled = checkedProp !== undefined;
+  const checked = isControlled ? checkedProp : isClickedState;
+
+  const dataState = checked ? "checked" : "unchecked";
+  const dataDisabled = disabled ? "" : undefined;
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { checked } = e.currentTarget;
+
+    if (!isControlled) {
+      setIsClickedState(checked);
+    }
+    onCheckedChange?.(checked);
+    onChange?.(e);
+  };
 
   return (
-    <label css={labelCss} data-state={dataState}>
+    <label css={labelCss} data-state={dataState} data-disabled={dataDisabled}>
       <input
         type="checkbox"
         css={inputCss}
-        onChange={(e) => setIsClicked(e.currentTarget.checked)}
+        onChange={handleOnChange}
+        defaultChecked={defaultChecked}
+        checked={checked}
+        disabled={disabled}
+        {...inputProps}
       />
-      <span css={iconWrapperCss} data-state={dataState}>
-        <CheckIcon style={{ visibility: isClicked ? "visible" : "hidden" }} css={iconCss} />
+      <span css={iconWrapperCss}>
+        <CheckIcon style={{ visibility: checked ? "visible" : "hidden" }} css={iconCss} />
       </span>
-      <span css={textWrapperCss} data-state={dataState}>
-        {children}
-      </span>
+      <span css={textWrapperCss}>{children}</span>
     </label>
   );
 };
@@ -31,6 +57,10 @@ const labelCss = css`
   display: inline-flex;
   align-items: center;
   position: relative;
+
+  &[data-disabled] {
+    opacity: 0.5;
+  }
 `;
 
 const inputCss = css`
@@ -59,7 +89,7 @@ const iconWrapperCss = css`
 
   transition: background-color 0.15s ease;
 
-  &[data-state="checked"] {
+  label[data-state="checked"] > & {
     background-color: #18181b;
   }
 
