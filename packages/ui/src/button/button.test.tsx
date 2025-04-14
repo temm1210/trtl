@@ -13,26 +13,28 @@ describe("Button tests", () => {
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
-  test("loading bar should be displayed when loading prop is true", () => {
-    const { getByRole, rerender } = render(
-      <Button loading loadingPlacement="left">
-        button
-      </Button>,
-    );
+  test("icon prop should work correctly", () => {
+    const { getByRole, rerender } = render(<Button leftIcon={<span>left</span>}>button</Button>);
 
     const button = getByRole("button");
 
     expect(button.children.length).toBe(2);
-    expect(button.children[1]?.textContent).toBe("button");
+    expect(button.children[0]?.textContent).toBe("left");
+
+    rerender(<Button rightIcon={<span>right</span>}>button</Button>);
+
+    expect(button.children.length).toBe(2);
+    expect(button.children[1]?.textContent).toBe("right");
 
     rerender(
-      <Button loading loadingPlacement="right">
-        button2
+      <Button leftIcon={<span>left</span>} rightIcon={<span>right</span>}>
+        button
       </Button>,
     );
 
-    expect(button.children.length).toBe(2);
-    expect(button.children[0]?.textContent).toBe("button2");
+    expect(button.children.length).toBe(3);
+    expect(button.children[0]?.textContent).toBe("left");
+    expect(button.children[2]?.textContent).toBe("right");
   });
 
   test("should be disabled when disabled prop is true", async () => {
