@@ -56,4 +56,23 @@ describe("Checkbox tests", () => {
     expect(handleOnChangeChecked).toHaveBeenCalledWith(false);
     expect(handleOnChangeChecked).toHaveBeenCalledTimes(2);
   });
+  test("disabled", async () => {
+    const handleOnChangeChecked = vi.fn();
+
+    const { getByRole, userEvent } = render(
+      <Checkbox disabled onCheckedChange={handleOnChangeChecked}>
+        checkbox
+      </Checkbox>,
+    );
+    const checkbox = getByRole("checkbox");
+
+    expect(checkbox).toBeDisabled();
+    expect(handleOnChangeChecked).not.toBeCalled();
+
+    await userEvent.click(checkbox);
+
+    expect(checkbox).not.toBeChecked();
+    expect(checkbox).toBeDisabled();
+    expect(handleOnChangeChecked).not.toBeCalled();
+  });
 });
