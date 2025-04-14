@@ -35,9 +35,7 @@ describe("Checkbox tests", () => {
       );
     };
 
-    const { getByRole, userEvent } = render(
-      <Comp checked onCheckedChange={handleOnChangeChecked} />,
-    );
+    const { getByRole, userEvent } = render(<Comp onCheckedChange={handleOnChangeChecked} />);
 
     const checkbox = getByRole("checkbox");
 
@@ -56,6 +54,7 @@ describe("Checkbox tests", () => {
     expect(handleOnChangeChecked).toHaveBeenCalledWith(false);
     expect(handleOnChangeChecked).toHaveBeenCalledTimes(2);
   });
+
   test("disabled", async () => {
     const handleOnChangeChecked = vi.fn();
 
@@ -74,5 +73,16 @@ describe("Checkbox tests", () => {
     expect(checkbox).not.toBeChecked();
     expect(checkbox).toBeDisabled();
     expect(handleOnChangeChecked).not.toBeCalled();
+  });
+
+  test("defaultChecked", async () => {
+    const { getByRole, userEvent } = render(<Checkbox defaultChecked>checkbox</Checkbox>);
+    const checkbox = getByRole("checkbox");
+
+    expect(checkbox).toBeChecked();
+
+    await userEvent.click(checkbox);
+
+    expect(checkbox).not.toBeChecked();
   });
 });
