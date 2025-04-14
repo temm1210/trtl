@@ -16,10 +16,10 @@ const Checkbox = ({
   onChange,
   ...inputProps
 }: CheckboxProps) => {
-  const [isClickedState, setIsClickedState] = useState(defaultChecked ?? false);
+  const [clickedState, setClickedState] = useState(defaultChecked ?? false);
 
   const isControlled = checkedProp !== undefined;
-  const checked = isControlled ? checkedProp : isClickedState;
+  const checked = isControlled ? checkedProp : clickedState;
 
   const dataState = checked ? "checked" : "unchecked";
   const dataDisabled = disabled ? "" : undefined;
@@ -28,7 +28,7 @@ const Checkbox = ({
     const { checked } = e.currentTarget;
 
     if (!isControlled) {
-      setIsClickedState(checked);
+      setClickedState(checked);
     }
     onCheckedChange?.(checked);
     onChange?.(e);

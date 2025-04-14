@@ -1,10 +1,34 @@
-import { useState } from "react";
-
 import { render } from "@rtl/react-utils";
 
-import Checkbox, { CheckboxProps } from "@/checkbox";
+import Checkbox from "@/checkbox";
 
 describe("Checkbox tests", () => {
+  test("onChangeChecked, onChange should work correctly", async () => {
+    const handleOnChangeChecked = vi.fn();
+    const handleOnChange = vi.fn();
+
+    const { getByRole, userEvent } = render(
+      <Checkbox onCheckedChange={handleOnChangeChecked} onChange={handleOnChange}>
+        checkbox
+      </Checkbox>,
+    );
+    const checkbox = getByRole("checkbox");
+
+    expect(handleOnChangeChecked).not.toBeCalled();
+
+    await userEvent.click(checkbox);
+
+    expect(handleOnChangeChecked).toHaveBeenCalledWith(true);
+    expect(handleOnChangeChecked).toHaveBeenCalledTimes(1);
+    expect(handleOnChange).toHaveBeenCalledTimes(1);
+
+    await userEvent.click(checkbox);
+
+    expect(handleOnChangeChecked).toHaveBeenCalledWith(false);
+    expect(handleOnChangeChecked).toHaveBeenCalledTimes(2);
+    expect(handleOnChange).toHaveBeenCalledTimes(2);
+  });
+
   test("uncontrolled", async () => {
     const { getByRole, userEvent } = render(<Checkbox>checkbox</Checkbox>);
     const checkbox = getByRole("checkbox");
@@ -17,42 +41,15 @@ describe("Checkbox tests", () => {
   });
 
   test("controlled", async () => {
-    const handleOnChangeChecked = vi.fn();
-
-    const Comp = ({ onCheckedChange }: CheckboxProps) => {
-      const [checkedState, setCheckedState] = useState(false);
-
-      return (
-        <Checkbox
-          checked={checkedState}
-          onCheckedChange={(checked) => {
-            setCheckedState(checked);
-            onCheckedChange?.(checked);
-          }}
-        >
-          checkbox
-        </Checkbox>
-      );
-    };
-
-    const { getByRole, userEvent } = render(<Comp onCheckedChange={handleOnChangeChecked} />);
+    const { getByRole, rerender } = render(<Checkbox checked>checkbox</Checkbox>);
 
     const checkbox = getByRole("checkbox");
 
-    expect(checkbox).not.toBeChecked();
-    expect(handleOnChangeChecked).not.toBeCalled();
-
-    await userEvent.click(checkbox);
-
     expect(checkbox).toBeChecked();
-    expect(handleOnChangeChecked).toHaveBeenCalledWith(true);
-    expect(handleOnChangeChecked).toHaveBeenCalledTimes(1);
 
-    await userEvent.click(checkbox);
+    rerender(<Checkbox checked={false}>checkbox</Checkbox>);
 
     expect(checkbox).not.toBeChecked();
-    expect(handleOnChangeChecked).toHaveBeenCalledWith(false);
-    expect(handleOnChangeChecked).toHaveBeenCalledTimes(2);
   });
 
   test("disabled", async () => {

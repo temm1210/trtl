@@ -7,8 +7,9 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: path.resolve(__dirname, "setupTest.ts"),
     coverage: {
-      provider: "istanbul",
+      provider: "v8",
       all: false,
+      clean: true,
     },
   },
 });
