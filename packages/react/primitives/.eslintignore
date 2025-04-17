@@ -1,4 +1,3 @@
-next.config.mjs
 .eslintrc.cjs
 .lintstagedrc.js
 node_modules
