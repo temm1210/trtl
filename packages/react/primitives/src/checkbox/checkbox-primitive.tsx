@@ -7,6 +7,10 @@ interface CheckboxContextValue {
 
 const [CheckboxProvider, useCheckboxContext] = createContext<CheckboxContextValue>();
 
+export interface CheckboxProps extends React.ComponentPropsWithRef<"input"> {
+  onCheckedChange?: (checked: boolean) => void;
+}
+
 const CheckboxRoot = () => {
   return (
     <CheckboxProvider value={{ state: "unchecked", disabled: false }}>
@@ -20,4 +24,5 @@ const CheckboxIndicator = () => {
   return <span>indicator</span>;
 };
 
-export { CheckboxIndicator, CheckboxRoot, useCheckboxContext };
+export default { Indicator: CheckboxIndicator, Root: CheckboxRoot };
+export { useCheckboxContext };
