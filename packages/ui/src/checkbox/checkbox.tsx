@@ -36,18 +36,21 @@ const Checkbox = ({
 
   return (
     <label css={labelCss} data-state={dataState} data-disabled={dataDisabled}>
-      <input
-        type="checkbox"
-        css={inputCss}
-        onChange={handleOnChange}
-        defaultChecked={defaultChecked}
-        checked={checked}
-        disabled={disabled}
-        {...inputProps}
-      />
-      <span css={iconWrapperCss}>
-        <CheckIcon style={{ visibility: checked ? "visible" : "hidden" }} css={iconCss} />
+      <span style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
+        <input
+          type="checkbox"
+          css={inputCss}
+          onChange={handleOnChange}
+          defaultChecked={defaultChecked}
+          checked={checked}
+          disabled={disabled}
+          {...inputProps}
+        />
+        <span css={iconWrapperCss}>
+          <CheckIcon style={{ visibility: checked ? "visible" : "hidden" }} css={iconCss} />
+        </span>
       </span>
+
       <span css={textWrapperCss}>{children}</span>
     </label>
   );
