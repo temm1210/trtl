@@ -21,6 +21,7 @@ const CheckboxRoot = (props: CheckboxRootProps) => {
     disabled,
     onCheckedChange,
     style,
+    className,
     onChange,
     ...inputProps
   } = props;
@@ -39,6 +40,8 @@ const CheckboxRoot = (props: CheckboxRootProps) => {
     onChange?.(e);
   };
 
+  const dataAttribute = getDataAttribute(checked, disabled);
+
   // for screen reader only
   const visuallyHiddenStyle: React.CSSProperties = {
     position: "absolute",
@@ -56,43 +59,45 @@ const CheckboxRoot = (props: CheckboxRootProps) => {
     <CheckboxProvider value={{ checked, disabled }}>
       <input
         type="checkbox"
-        style={{
-          ...visuallyHiddenStyle,
-          ...style,
-        }}
+        style={visuallyHiddenStyle}
         onChange={handleOnChange}
         defaultChecked={defaultChecked}
         checked={checked}
         disabled={disabled}
         {...inputProps}
       />
-      {children}
+      <div {...dataAttribute} style={style} className={className}>
+        {children}
+      </div>
     </CheckboxProvider>
   );
 };
 
-export interface CheckboxIndicatorProps extends React.ComponentPropsWithRef<"div"> {}
+export interface CheckboxIndicatorProps extends React.ComponentPropsWithRef<"span"> {}
 
 const CheckboxIndicator = ({ children, ...restProps }: CheckboxIndicatorProps) => {
   const { checked, disabled } = useCheckboxContext();
 
-  const dataState = checked ? "checked" : "unchecked";
-  const dataDisabled = disabled ? "" : undefined;
+  const dataAttribute = getDataAttribute(checked, disabled);
 
   return (
-    <div data-state={dataState} data-disabled={dataDisabled} {...restProps}>
-      <span
-        style={{
-          display: "inline-block",
-          width: "100%",
-          height: "100%",
-          visibility: checked ? "visible" : "hidden",
-        }}
-      >
-        {children}
-      </span>
-    </div>
+    <span
+      style={{
+        visibility: checked ? "visible" : "hidden",
+      }}
+      {...dataAttribute}
+      {...restProps}
+    >
+      {children}
+    </span>
   );
 };
+
+function getDataAttribute(checked: boolean | undefined, disabled: boolean | undefined) {
+  return {
+    "data-state": checked ? "checked" : "unchecked",
+    "data-disabled": disabled ? "" : undefined,
+  };
+}
 
 export { CheckboxIndicator, CheckboxRoot, useCheckboxContext };

@@ -1,51 +1,24 @@
-import { CheckIcon } from "@rtl/icons";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta } from "@storybook/react";
 
 import { CheckboxIndicator, CheckboxRoot } from "./checkbox-primitive";
 
-const CheckboxPrimitive = {
-  Root: CheckboxRoot,
-  Indicator: CheckboxIndicator,
-};
-
-const meta: Meta<typeof CheckboxPrimitive.Root> = {
+const meta: Meta<typeof CheckboxRoot> = {
   title: "Primitives/CheckboxPrimitive",
-  component: CheckboxPrimitive.Root,
+  component: CheckboxRoot,
+
   // https://github.com/storybookjs/storybook/issues/23170
-  subcomponents: { Indicator: CheckboxPrimitive.Indicator } as any,
+  subcomponents: { Indicator: CheckboxIndicator } as any,
   parameters: {
     layout: "centered",
+  },
+  argTypes: {
+    disabled: {
+      control: "boolean",
+    },
   },
   tags: ["autodocs"],
 };
 
 export default meta;
-type Story = StoryObj<typeof meta>;
 
-export const Base: StoryObj<Story> = {
-  render: (props) => {
-    return (
-      <label style={{ display: "inline-flex", alignItems: "center" }}>
-        <CheckboxPrimitive.Root {...props}>
-          <CheckboxPrimitive.Indicator
-            style={{
-              position: "relative",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "1.25rem",
-              height: "1.25rem",
-              border: "2px solid #e4e4e7",
-              borderRadius: "0.25rem",
-              boxSizing: "border-box",
-              backgroundColor: "#ffffff",
-            }}
-          >
-            <CheckIcon />
-          </CheckboxPrimitive.Indicator>
-        </CheckboxPrimitive.Root>
-        <span>checkbox</span>
-      </label>
-    );
-  },
-};
+export { default as Base } from "./example";
