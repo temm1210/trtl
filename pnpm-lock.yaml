@@ -173,6 +173,10 @@ importers:
         version: link:../../config/typescript
 
   packages/react/primitives:
+    dependencies:
+      '@rtl/icons':
+        specifier: workspace:*
+        version: link:../icons
     devDependencies:
       '@rtl/eslint-config':
         specifier: workspace:*

@@ -1,3 +1,4 @@
+import { CheckIcon } from "@rtl/icons";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { CheckboxIndicator, CheckboxRoot } from "./checkbox-primitive";
@@ -24,9 +25,27 @@ type Story = StoryObj<typeof meta>;
 export const Base: StoryObj<Story> = {
   render: (props) => {
     return (
-      <CheckboxPrimitive.Root {...props}>
-        <CheckboxIndicator>indicator</CheckboxIndicator>
-      </CheckboxPrimitive.Root>
+      <label style={{ display: "inline-flex", alignItems: "center" }}>
+        <CheckboxPrimitive.Root {...props}>
+          <CheckboxPrimitive.Indicator
+            style={{
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "1.25rem",
+              height: "1.25rem",
+              border: "2px solid #e4e4e7",
+              borderRadius: "0.25rem",
+              boxSizing: "border-box",
+              backgroundColor: "#ffffff",
+            }}
+          >
+            <CheckIcon />
+          </CheckboxPrimitive.Indicator>
+        </CheckboxPrimitive.Root>
+        <span>checkbox</span>
+      </label>
     );
   },
 };

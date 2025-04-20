@@ -21,6 +21,7 @@ const CheckboxRoot = (props: CheckboxRootProps) => {
     disabled,
     onCheckedChange,
     style,
+    onChange,
     ...inputProps
   } = props;
   const [clickedState, setClickedState] = React.useState(defaultChecked ?? false);
@@ -29,12 +30,13 @@ const CheckboxRoot = (props: CheckboxRootProps) => {
   const checked = isControlled ? checkedProp : clickedState;
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { checked } = e.currentTarget;
+    const nextChecked = e.currentTarget.checked;
 
     if (!isControlled) {
-      setClickedState(checked);
+      setClickedState(nextChecked);
     }
-    onCheckedChange?.(checked);
+    onCheckedChange?.(nextChecked);
+    onChange?.(e);
   };
 
   // for screen reader only
@@ -42,40 +44,55 @@ const CheckboxRoot = (props: CheckboxRootProps) => {
     position: "absolute",
     width: "1px",
     height: "1px",
-    clip: "rect(0px, 0px, 0px, 0px)",
+    clip: "rect(0, 0, 0, 0)",
     border: "0px",
     margin: "-1px",
     overflow: "hidden",
-    padding: "0px",
     whiteSpace: "nowrap",
     overflowWrap: "normal",
   };
 
   return (
     <CheckboxProvider value={{ checked, disabled }}>
-      <span style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
-        <input
-          type="checkbox"
-          style={{
-            ...visuallyHiddenStyle,
-            ...style,
-          }}
-          onChange={handleOnChange}
-          defaultChecked={defaultChecked}
-          checked={checked}
-          disabled={disabled}
-          {...inputProps}
-        />
-        {children}
-      </span>
+      <input
+        type="checkbox"
+        style={{
+          ...visuallyHiddenStyle,
+          ...style,
+        }}
+        onChange={handleOnChange}
+        defaultChecked={defaultChecked}
+        checked={checked}
+        disabled={disabled}
+        {...inputProps}
+      />
+      {children}
     </CheckboxProvider>
   );
 };
 
-export interface CheckboxIndicatorProps extends React.ComponentPropsWithRef<"span"> {}
+export interface CheckboxIndicatorProps extends React.ComponentPropsWithRef<"div"> {}
 
-const CheckboxIndicator = (props: CheckboxIndicatorProps) => {
-  return <span {...props} />;
+const CheckboxIndicator = ({ children, ...restProps }: CheckboxIndicatorProps) => {
+  const { checked, disabled } = useCheckboxContext();
+
+  const dataState = checked ? "checked" : "unchecked";
+  const dataDisabled = disabled ? "" : undefined;
+
+  return (
+    <div data-state={dataState} data-disabled={dataDisabled} {...restProps}>
+      <span
+        style={{
+          display: "inline-block",
+          width: "100%",
+          height: "100%",
+          visibility: checked ? "visible" : "hidden",
+        }}
+      >
+        {children}
+      </span>
+    </div>
+  );
 };
 
 export { CheckboxIndicator, CheckboxRoot, useCheckboxContext };

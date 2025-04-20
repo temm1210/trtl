@@ -15,5 +15,8 @@
     "@rtl/eslint-config": "workspace:*",
     "@rtl/react-utils": "workspace:*",
     "@rtl/typescript-config": "workspace:*"
+  },
+  "dependencies": {
+    "@rtl/icons": "workspace:*"
   }
 }
