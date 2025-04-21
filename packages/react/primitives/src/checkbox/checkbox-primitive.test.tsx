@@ -123,4 +123,17 @@ describe("Checkbox primitive tests", () => {
     expect(checkboxRoot).toHaveAttribute("data-disabled");
     expect(checkboxIndicator).toHaveAttribute("data-disabled");
   });
+
+  test("indicator must be visible when checked", async () => {
+    const { getByRole, getByTestId, userEvent } = render(<Checkbox>checkbox</Checkbox>);
+
+    const checkbox = getByRole("checkbox");
+    const checkboxIndicator = getByTestId("test-check");
+
+    expect(checkboxIndicator).not.toBeVisible();
+
+    await userEvent.click(checkbox);
+
+    expect(checkboxIndicator).toBeVisible();
+  });
 });
