@@ -125,15 +125,16 @@ describe("Checkbox primitive tests", () => {
   });
 
   test("indicator must be visible when checked", async () => {
-    const { getByRole, getByTestId, userEvent } = render(<Checkbox>checkbox</Checkbox>);
+    const { getByRole, queryByTestId, findByTestId, userEvent } = render(
+      <Checkbox>checkbox</Checkbox>,
+    );
 
     const checkbox = getByRole("checkbox");
-    const checkboxIndicator = getByTestId("test-check");
 
-    expect(checkboxIndicator).not.toBeVisible();
+    expect(queryByTestId("test-check")).not.toBeInTheDocument();
 
     await userEvent.click(checkbox);
 
-    expect(checkboxIndicator).toBeVisible();
+    expect(await findByTestId("test-check")).toBeInTheDocument();
   });
 });

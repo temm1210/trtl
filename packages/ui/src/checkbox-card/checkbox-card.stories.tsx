@@ -1,4 +1,4 @@
-import { GuardIcon } from "@rtl/icons";
+import { ReactIcon } from "@rtl/icons";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import CheckboxCard from "./checkbox-card";
@@ -17,6 +17,13 @@ type Story = StoryObj<typeof meta>;
 
 export const Base: Story = {
   render: (args) => {
-    return <CheckboxCard {...args} icon={<GuardIcon />} />;
+    return (
+      <CheckboxCard
+        {...args}
+        title="React"
+        description="The library for web and native user interfaces"
+        icon={<ReactIcon />}
+      />
+    );
   },
 };
