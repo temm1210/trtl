@@ -1,7 +1,7 @@
 * {
   box-sizing: border-box;
-  width: inherit;
-  height: inherit;
+  width: auto;
+  height: auto;
 }
 
 html,

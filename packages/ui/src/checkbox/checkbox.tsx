@@ -1,85 +1,29 @@
-import { useState } from "react";
-
 import { css } from "@emotion/react";
 import { CheckIcon } from "@rtl/icons";
+import { CheckboxPrimitive, CheckboxRootProps } from "@rtl/react-primitives";
 
-export interface CheckboxProps extends React.ComponentPropsWithRef<"input"> {
-  onCheckedChange?: (checked: boolean) => void;
-}
+export interface CheckboxProps extends CheckboxRootProps {}
 
-const Checkbox = ({
-  children,
-  checked: checkedProp,
-  defaultChecked,
-  disabled,
-  onCheckedChange,
-  onChange,
-  ...inputProps
-}: CheckboxProps) => {
-  const [clickedState, setClickedState] = useState(defaultChecked ?? false);
-
-  const isControlled = checkedProp !== undefined;
-  const checked = isControlled ? checkedProp : clickedState;
-
-  const dataState = checked ? "checked" : "unchecked";
-  const dataDisabled = disabled ? "" : undefined;
-
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { checked } = e.currentTarget;
-
-    if (!isControlled) {
-      setClickedState(checked);
-    }
-    onCheckedChange?.(checked);
-    onChange?.(e);
-  };
-
+const Checkbox = ({ disabled, children, ...restProps }: CheckboxProps) => {
   return (
-    <label css={labelCss} data-state={dataState} data-disabled={dataDisabled}>
-      <span style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
-        <input
-          type="checkbox"
-          css={inputCss}
-          onChange={handleOnChange}
-          defaultChecked={defaultChecked}
-          checked={checked}
-          disabled={disabled}
-          {...inputProps}
-        />
-        <span css={iconWrapperCss}>
-          <CheckIcon style={{ visibility: checked ? "visible" : "hidden" }} css={iconCss} />
-        </span>
-      </span>
-
-      <span css={textWrapperCss}>{children}</span>
+    <label css={labelCss} style={{ opacity: disabled ? 0.5 : 1 }}>
+      <CheckboxPrimitive.Root disabled={disabled} css={rootCss} {...restProps}>
+        <CheckboxPrimitive.Indicator css={indicatorCss}>
+          <CheckIcon css={iconCss} />
+        </CheckboxPrimitive.Indicator>
+      </CheckboxPrimitive.Root>
+      <span css={textCss}>{children}</span>
     </label>
   );
 };
 
 const labelCss = css`
-  display: inline-flex;
+  display: flex;
   align-items: center;
   position: relative;
-
-  &[data-disabled] {
-    opacity: 0.5;
-  }
 `;
 
-const inputCss = css`
-  border: 0px;
-  clip: rect(0px, 0px, 0px, 0px);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0px;
-  position: absolute;
-  width: 1px;
-  white-space: nowrap;
-  overflow-wrap: normal;
-`;
-
-const iconWrapperCss = css`
+const rootCss = css`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -92,7 +36,7 @@ const iconWrapperCss = css`
 
   transition: background-color 0.15s ease;
 
-  label[data-state="checked"] > & {
+  &[data-state="checked"] {
     background-color: #18181b;
   }
 
@@ -101,6 +45,10 @@ const iconWrapperCss = css`
     outline-offset: 1px;
   }
 `;
+const indicatorCss = css`
+  display: inline-flex;
+  align-items: center;
+`;
 
 const iconCss = css`
   width: 0.875rem;
@@ -108,9 +56,9 @@ const iconCss = css`
   color: #ffffff;
 `;
 
-const textWrapperCss = css`
+const textCss = css`
   display: inline-block;
-  padding-left: 0.5rem;
+  padding-left: 0.4rem;
   user-select: none;
 `;
 
