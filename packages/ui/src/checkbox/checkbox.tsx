@@ -21,6 +21,7 @@ const labelCss = css`
   display: flex;
   align-items: center;
   position: relative;
+  cursor: pointer;
 `;
 
 const rootCss = css`
