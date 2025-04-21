@@ -38,4 +38,58 @@ describe("Checkbox primitive tests", () => {
     expect(handleOnChangeChecked).toHaveBeenCalledTimes(2);
     expect(handleOnChange).toHaveBeenCalledTimes(2);
   });
+
+  test("uncontrolled", async () => {
+    const { getByRole, userEvent } = render(<Checkbox>checkbox</Checkbox>);
+    const checkbox = getByRole("checkbox");
+
+    expect(checkbox).not.toBeChecked();
+
+    await userEvent.click(checkbox);
+
+    expect(checkbox).toBeChecked();
+  });
+
+  test("controlled", async () => {
+    const { getByRole, rerender } = render(<Checkbox checked>checkbox</Checkbox>);
+
+    const checkbox = getByRole("checkbox");
+
+    expect(checkbox).toBeChecked();
+
+    rerender(<Checkbox checked={false}>checkbox</Checkbox>);
+
+    expect(checkbox).not.toBeChecked();
+  });
+
+  test("disabled", async () => {
+    const handleOnChangeChecked = vi.fn();
+
+    const { getByRole, userEvent } = render(
+      <Checkbox disabled onCheckedChange={handleOnChangeChecked}>
+        checkbox
+      </Checkbox>,
+    );
+    const checkbox = getByRole("checkbox");
+
+    expect(checkbox).toBeDisabled();
+    expect(handleOnChangeChecked).not.toBeCalled();
+
+    await userEvent.click(checkbox);
+
+    expect(checkbox).not.toBeChecked();
+    expect(checkbox).toBeDisabled();
+    expect(handleOnChangeChecked).not.toBeCalled();
+  });
+
+  test("defaultChecked", async () => {
+    const { getByRole, userEvent } = render(<Checkbox defaultChecked>checkbox</Checkbox>);
+    const checkbox = getByRole("checkbox");
+
+    expect(checkbox).toBeChecked();
+
+    await userEvent.click(checkbox);
+
+    expect(checkbox).not.toBeChecked();
+  });
 });
