@@ -5,7 +5,7 @@ import "./example.css";
 
 const Example = (props: CheckboxRootProps) => {
   return (
-    <label style={{ display: "flex", alignItems: "center" }}>
+    <label style={{ display: "flex", alignItems: "center", opacity: props.disabled ? 0.5 : 1 }}>
       <CheckboxPrimitive.Root className="CheckboxRoot" {...props}>
         <CheckboxPrimitive.Indicator>
           <CheckIcon className="CheckboxIcon" />

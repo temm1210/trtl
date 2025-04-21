@@ -1,13 +1,11 @@
-import type { Meta } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react";
 
-import { CheckboxIndicator, CheckboxRoot } from "./checkbox-primitive";
+import { CheckboxRoot } from "./checkbox-primitive";
+import CheckboxExample from "./example";
 
 const meta: Meta<typeof CheckboxRoot> = {
   title: "Primitives/CheckboxPrimitive",
   component: CheckboxRoot,
-
-  // https://github.com/storybookjs/storybook/issues/23170
-  subcomponents: { Indicator: CheckboxIndicator } as any,
   parameters: {
     layout: "centered",
   },
@@ -15,10 +13,25 @@ const meta: Meta<typeof CheckboxRoot> = {
     disabled: {
       control: "boolean",
     },
+    checked: {
+      control: "boolean",
+    },
   },
   tags: ["autodocs"],
 };
 
 export default meta;
+type Story = StoryObj<typeof meta>;
 
-export { default as Base } from "./example";
+export const Base: StoryObj<Story> = {
+  render: (args) => <CheckboxExample {...args} />,
+};
+
+export const DefaultChecked: StoryObj<Story> = {
+  argTypes: {
+    checked: {
+      control: false,
+    },
+  },
+  render: () => <CheckboxExample defaultChecked />,
+};
