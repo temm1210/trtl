@@ -19,6 +19,7 @@
     "@rtl/typescript-config": "workspace:*"
   },
   "dependencies": {
+    "@floating-ui/react": "^0.27.8",
     "@rtl/icons": "workspace:*"
   }
 }
