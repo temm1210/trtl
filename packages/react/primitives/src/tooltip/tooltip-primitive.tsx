@@ -1,10 +1,11 @@
 import { useState } from "react";
 
-import { autoUpdate, useFloating, useFocus, useHover, useInteractions } from "@floating-ui/react";
+import { autoUpdate, useFloating, useHover, useInteractions } from "@floating-ui/react";
 
-export interface TooltipProps {}
+export interface TooltipRootProps {}
 
-const Tooltip = (props: TooltipProps) => {
+/************************************ ROOT *************************************/
+const TooltipRoot = (props: TooltipRootProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
@@ -12,10 +13,9 @@ const Tooltip = (props: TooltipProps) => {
     whileElementsMounted: autoUpdate,
   });
 
-  const hover = useHover(context);
-  const focus = useFocus(context);
+  const hover = useHover(context, { delay: 200 });
 
-  const { getReferenceProps, getFloatingProps } = useInteractions([hover, focus]);
+  const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
 
   return (
     <div {...props}>
@@ -31,4 +31,29 @@ const Tooltip = (props: TooltipProps) => {
   );
 };
 
-export default Tooltip;
+//  0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+/************************************ TRIGGER *************************************/
+export interface TooltipTriggerProps extends React.ComponentPropsWithRef<"button"> {}
+const TooltipTrigger = (props: TooltipTriggerProps) => {
+  return <button {...props} />;
+};
+
+/************************************ PORTAL *************************************/
+export interface TooltipPortalProps {
+  children: React.ReactNode;
+}
+const TooltipPortal = (props: TooltipPortalProps) => {
+  return <button {...props} />;
+};
+
+/************************************ CONTENT *************************************/
+export interface TooltipContentProps extends React.ComponentPropsWithRef<"div"> {}
+const TooltipContent = ({ children, ...restProps }: TooltipContentProps) => {
+  return <div {...restProps}>{children}</div>;
+};
+
+const TooltipArrow = (props: TooltipPortalProps) => {
+  return <button {...props} />;
+};
+
+export { TooltipArrow, TooltipContent, TooltipPortal, TooltipRoot, TooltipTrigger };

@@ -1,12 +1,20 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react";
 
-import Tooltip from "./tooltip-primitive";
+import Tooltip from "./example";
 
 const meta: Meta<typeof Tooltip> = {
-  title: "Primitives/TooltipPrimitive",
+  title: "Primitives/CheckboxPrimitive",
   component: Tooltip,
   parameters: {
     layout: "centered",
+  },
+  argTypes: {
+    disabled: {
+      control: "boolean",
+    },
+    checked: {
+      control: "boolean",
+    },
   },
   tags: ["autodocs"],
 };
