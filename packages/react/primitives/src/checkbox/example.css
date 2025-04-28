@@ -1,4 +1,4 @@
-.CheckboxRoot {
+.checkbox-root {
   display: flex;
   align-items: center;
 
@@ -12,7 +12,7 @@
     outline-offset: 1px;
   }
 }
-.CheckboxIndicator {
+.checkbox-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,14 +28,14 @@
   }
 }
 
-.CheckboxIcon {
+.checkbox-icon {
   color: #000000;
   display: block;
   width: 0.875rem;
   height: 0.875rem;
 }
 
-.CheckboxText {
+.checkbox-text {
   display: inline-block;
   padding-left: 0.45rem;
   user-select: none;

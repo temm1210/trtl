@@ -13,6 +13,8 @@ export type {
   TooltipTriggerProps,
 } from "./tooltip-primitive";
 
+export { useTooltipPrimitiveContext } from "./tooltip-primitive";
+
 const TooltipPrimitive = {
   Root: TooltipRoot,
   Content: TooltipContent,

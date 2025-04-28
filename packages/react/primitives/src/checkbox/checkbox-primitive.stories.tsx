@@ -4,7 +4,7 @@ import { CheckboxRoot } from "./checkbox-primitive";
 import Checkbox from "./example";
 
 const meta: Meta<typeof CheckboxRoot> = {
-  title: "Primitives/CheckboxPrimitive",
+  title: "Primitives/Checkbox",
   component: CheckboxRoot,
   parameters: {
     layout: "centered",

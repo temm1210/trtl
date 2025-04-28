@@ -5,11 +5,11 @@ import "./example.css";
 
 const Example = (props: CheckboxRootProps) => {
   return (
-    <CheckboxPrimitive.Root className="CheckboxRoot" {...props}>
-      <CheckboxPrimitive.Indicator className="CheckboxIndicator">
-        <CheckIcon className="CheckboxIcon" />
+    <CheckboxPrimitive.Root className="checkbox-root" {...props}>
+      <CheckboxPrimitive.Indicator className="checkbox-indicator">
+        <CheckIcon className="checkbox-icon" />
       </CheckboxPrimitive.Indicator>
-      <span className="CheckboxText">checkbox</span>
+      <span className="checkbox-text">checkbox</span>
     </CheckboxPrimitive.Root>
   );
 };

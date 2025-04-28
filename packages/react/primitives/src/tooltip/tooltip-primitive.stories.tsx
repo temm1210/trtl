@@ -3,18 +3,10 @@ import { Meta, StoryObj } from "@storybook/react";
 import Tooltip from "./example";
 
 const meta: Meta<typeof Tooltip> = {
-  title: "Primitives/CheckboxPrimitive",
+  title: "Primitives/Tooltip",
   component: Tooltip,
   parameters: {
     layout: "centered",
-  },
-  argTypes: {
-    disabled: {
-      control: "boolean",
-    },
-    checked: {
-      control: "boolean",
-    },
   },
   tags: ["autodocs"],
 };

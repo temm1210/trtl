@@ -1,49 +1,103 @@
 import { useState } from "react";
 
-import { autoUpdate, useFloating, useHover, useInteractions } from "@floating-ui/react";
+import {
+  autoUpdate,
+  FloatingPortal,
+  FloatingPortalProps,
+  useFloating,
+  UseFloatingReturn,
+  useHover,
+  useInteractions,
+  UseInteractionsReturn,
+} from "@floating-ui/react";
+import { createContext } from "@rtl/react-utils";
 
-export interface TooltipRootProps {}
+interface TooltipContextValue {
+  floatingElement: UseFloatingReturn;
+  interaction: {
+    getReferenceProps: UseInteractionsReturn["getReferenceProps"];
+    getFloatingProps: UseInteractionsReturn["getFloatingProps"];
+  };
+
+  isOpen: boolean;
+}
+
+const [TooltipPrimitiveProvider, useTooltipPrimitiveContext] = createContext<TooltipContextValue>();
+
+export interface TooltipRootProps {
+  children?: React.ReactNode;
+}
 
 /************************************ ROOT *************************************/
-const TooltipRoot = (props: TooltipRootProps) => {
+const TooltipRoot = ({ children }: TooltipRootProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { refs, floatingStyles, context } = useFloating({
+  const floatingElement = useFloating({
     open: isOpen,
     onOpenChange: setIsOpen,
     whileElementsMounted: autoUpdate,
   });
 
-  const hover = useHover(context, { delay: 200 });
-
+  const hover = useHover(floatingElement.context, { delay: { open: 200, close: 100 } });
   const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
 
   return (
-    <div {...props}>
-      <button ref={refs.setReference} {...getReferenceProps}>
+    <TooltipPrimitiveProvider
+      value={{
+        interaction: {
+          getReferenceProps,
+          getFloatingProps,
+        },
+        floatingElement,
+        isOpen,
+      }}
+    >
+      {children}
+      {/* <button ref={refs.setReference} {...getReferenceProps}>
         trigger
       </button>
-      {isOpen && (
-        <div ref={refs.setFloating} style={floatingStyles} {...getFloatingProps}>
-          it is tooltip
-        </div>
-      )}
-    </div>
+
+      <div ref={refs.setFloating} style={floatingStyles} {...getFloatingProps}>
+        it is tooltip
+      </div> */}
+    </TooltipPrimitiveProvider>
   );
 };
 
-//  0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
 /************************************ TRIGGER *************************************/
 export interface TooltipTriggerProps extends React.ComponentPropsWithRef<"button"> {}
-const TooltipTrigger = (props: TooltipTriggerProps) => {
-  return <button {...props} />;
+
+const TooltipTrigger = ({ children, ...restProps }: TooltipTriggerProps) => {
+  const { floatingElement, interaction } = useTooltipPrimitiveContext();
+  const { refs } = floatingElement;
+
+  return (
+    <button
+      type="button"
+      ref={refs.setReference}
+      {...restProps}
+      {...interaction.getReferenceProps()}
+    >
+      {children}
+    </button>
+  );
 };
 
 /************************************ PORTAL *************************************/
-export interface TooltipPortalProps {
-  children: React.ReactNode;
-}
-const TooltipPortal = (props: TooltipPortalProps) => {
-  return <button {...props} />;
+export interface TooltipPortalProps extends FloatingPortalProps {}
+
+const TooltipPortal = ({ children }: TooltipPortalProps) => {
+  const { floatingElement, interaction, isOpen } = useTooltipPrimitiveContext();
+  const { refs, floatingStyles } = floatingElement;
+
+  console.log("isOpen:", isOpen);
+
+  return isOpen ? (
+    <FloatingPortal>
+      <div ref={refs.setFloating} style={floatingStyles} {...interaction.getFloatingProps()}>
+        {children}
+      </div>
+    </FloatingPortal>
+  ) : null;
 };
 
 /************************************ CONTENT *************************************/
@@ -53,7 +107,14 @@ const TooltipContent = ({ children, ...restProps }: TooltipContentProps) => {
 };
 
 const TooltipArrow = (props: TooltipPortalProps) => {
-  return <button {...props} />;
+  return <span {...props} />;
 };
 
-export { TooltipArrow, TooltipContent, TooltipPortal, TooltipRoot, TooltipTrigger };
+export {
+  TooltipArrow,
+  TooltipContent,
+  TooltipPortal,
+  TooltipRoot,
+  TooltipTrigger,
+  useTooltipPrimitiveContext,
+};
