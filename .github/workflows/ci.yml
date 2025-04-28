@@ -2,10 +2,12 @@ name: Check quality
 
 on:
   push:
-    branches: ["**"]
+    branches:
+      - main
 
   pull_request:
-    branches: ["**"]
+    branches:
+      - main
 
 env:
   NODE_VERSION: "20"
