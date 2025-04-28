@@ -5,7 +5,9 @@
   "type": "module",
   "main": "./src/index.ts",
   "scripts": {
+    "test": "vitest run",
     "test:watch": "vitest watch",
+    "lint": "eslint --fix",
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {
