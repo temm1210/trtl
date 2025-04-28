@@ -2,8 +2,12 @@ import { useState } from "react";
 
 import {
   autoUpdate,
+  flip,
   FloatingPortal,
   FloatingPortalProps,
+  offset,
+  shift,
+  useClick,
   useFloating,
   UseFloatingReturn,
   useHover,
@@ -32,13 +36,17 @@ export interface TooltipRootProps {
 const TooltipRoot = ({ children }: TooltipRootProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const floatingElement = useFloating({
+    placement: "top",
     open: isOpen,
     onOpenChange: setIsOpen,
     whileElementsMounted: autoUpdate,
+    middleware: [shift({ padding: 5 }), offset(5), flip({ padding: 5 })],
   });
 
   const hover = useHover(floatingElement.context, { delay: { open: 200, close: 100 } });
-  const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
+  const click = useClick(floatingElement.context);
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([hover, click]);
 
   return (
     <TooltipPrimitiveProvider
@@ -52,13 +60,6 @@ const TooltipRoot = ({ children }: TooltipRootProps) => {
       }}
     >
       {children}
-      {/* <button ref={refs.setReference} {...getReferenceProps}>
-        trigger
-      </button>
-
-      <div ref={refs.setFloating} style={floatingStyles} {...getFloatingProps}>
-        it is tooltip
-      </div> */}
     </TooltipPrimitiveProvider>
   );
 };
