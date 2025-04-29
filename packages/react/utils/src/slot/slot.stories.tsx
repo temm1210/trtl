@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { Slot, Slottable } from "@/slot";
+import { Slot, Slottable } from "./slot";
 
 const meta: Meta<typeof Slot> = {
   title: "Primitives/Slot",

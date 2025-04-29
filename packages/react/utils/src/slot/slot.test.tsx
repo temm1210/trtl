@@ -1,6 +1,6 @@
-import { render } from "@rtl/react-utils";
-
 import { Slot, Slottable } from "@/slot";
+
+import { render } from "../test/utils";
 
 const serialize = (html: string) =>
   html
