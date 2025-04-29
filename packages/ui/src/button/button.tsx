@@ -1,7 +1,7 @@
 import React from "react";
 
 import { css } from "@emotion/react";
-import { Slot, Slottable } from "@rtl/react-primitives";
+import { Slot, Slottable } from "@rtl/react-utils";
 
 import Spinner, { SpinnerProps } from "@/spinner";
 
