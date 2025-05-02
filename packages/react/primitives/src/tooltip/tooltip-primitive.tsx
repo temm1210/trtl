@@ -8,14 +8,13 @@ import {
   FloatingPortalProps,
   offset,
   shift,
-  useClick,
   useFloating,
   UseFloatingReturn,
   useHover,
   useInteractions,
   UseInteractionsReturn,
 } from "@floating-ui/react";
-import { createContext } from "@rtl/react-utils";
+import { createContext, Slot } from "@rtl/react-utils";
 
 interface TooltipContextValue {
   floatingElement: UseFloatingReturn;
@@ -23,15 +22,18 @@ interface TooltipContextValue {
     getReferenceProps: UseInteractionsReturn["getReferenceProps"];
     getFloatingProps: UseInteractionsReturn["getFloatingProps"];
   };
-  arrowRef: React.RefAttributes<HTMLElement>["ref"];
+  arrowRef: React.RefObject<HTMLDivElement | null>;
   isOpen: boolean;
 }
 
-const [TooltipPrimitiveProvider, useTooltipPrimitiveContext] = createContext<TooltipContextValue>();
+const [TooltipPrimitiveProvider, useTooltipPrimitiveContext] =
+  createContext<TooltipContextValue>();
 
 export interface TooltipRootProps {
   children?: React.ReactNode;
 }
+
+const DEFAULT_ARROW_HEIGHT = 15;
 
 /************************************ ROOT *************************************/
 const TooltipRoot = ({ children }: TooltipRootProps) => {
@@ -44,7 +46,7 @@ const TooltipRoot = ({ children }: TooltipRootProps) => {
     whileElementsMounted: autoUpdate,
     middleware: [
       shift({ padding: 5 }),
-      offset(5),
+      offset(DEFAULT_ARROW_HEIGHT),
       flip({ padding: 5 }),
       arrow({
         element: arrowRef,
@@ -52,10 +54,11 @@ const TooltipRoot = ({ children }: TooltipRootProps) => {
     ],
   });
 
-  const hover = useHover(floatingElement.context, { delay: { open: 200, close: 100 } });
-  const click = useClick(floatingElement.context);
+  const hover = useHover(floatingElement.context, {
+    delay: { open: 200, close: 100 },
+  });
 
-  const { getReferenceProps, getFloatingProps } = useInteractions([hover, click]);
+  const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
 
   return (
     <TooltipPrimitiveProvider
@@ -75,7 +78,8 @@ const TooltipRoot = ({ children }: TooltipRootProps) => {
 };
 
 /************************************ TRIGGER *************************************/
-export interface TooltipTriggerProps extends React.ComponentPropsWithRef<"button"> {}
+export interface TooltipTriggerProps
+  extends React.ComponentPropsWithRef<"button"> {}
 
 const TooltipTrigger = ({ children, ...restProps }: TooltipTriggerProps) => {
   const { floatingElement, interaction } = useTooltipPrimitiveContext();
@@ -102,7 +106,11 @@ const TooltipPortal = ({ children }: TooltipPortalProps) => {
 
   return isOpen ? (
     <FloatingPortal>
-      <div ref={refs.setFloating} style={floatingStyles} {...interaction.getFloatingProps()}>
+      <div
+        ref={refs.setFloating}
+        style={floatingStyles}
+        {...interaction.getFloatingProps()}
+      >
         {children}
       </div>
     </FloatingPortal>
@@ -110,13 +118,41 @@ const TooltipPortal = ({ children }: TooltipPortalProps) => {
 };
 
 /************************************ CONTENT *************************************/
-export interface TooltipContentProps extends React.ComponentPropsWithRef<"div"> {}
+export interface TooltipContentProps
+  extends React.ComponentPropsWithRef<"div"> {}
 const TooltipContent = ({ children, ...restProps }: TooltipContentProps) => {
   return <div {...restProps}>{children}</div>;
 };
 
-const TooltipArrow = (props: TooltipPortalProps) => {
-  return <span {...props} />;
+export interface TooltipArrowProps extends React.ComponentPropsWithRef<"div"> {
+  asChild?: boolean;
+}
+
+const TooltipArrow = ({
+  asChild = false,
+  children,
+  style,
+  ...restProps
+}: TooltipArrowProps) => {
+  const Comp = asChild ? Slot : "div";
+  const { arrowRef, floatingElement } = useTooltipPrimitiveContext();
+  const { middlewareData } = floatingElement;
+
+  return (
+    <Comp
+      ref={arrowRef}
+      {...restProps}
+      style={{
+        position: "absolute",
+        left: middlewareData.arrow?.x,
+        top: middlewareData.arrow?.y,
+        height: `${DEFAULT_ARROW_HEIGHT}px`,
+        ...style,
+      }}
+    >
+      {children}
+    </Comp>
+  );
 };
 
 export {

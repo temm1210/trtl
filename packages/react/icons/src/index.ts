@@ -1,3 +1,4 @@
+export { default as ArrowDownFillIcon } from "./arrow-down-fill-icon";
 export { default as ArrowUpOutlineIcon } from "./arrow-up-outline-icon";
 export { default as CheckIcon } from "./check-icon";
 export { default as DownloadSolidIcon } from "./download-solid-icon";

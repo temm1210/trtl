@@ -1,17 +1,22 @@
+import { ArrowDownFillIcon } from "@rtl/icons";
+
 import { TooltipPrimitive, TooltipRootProps } from "./";
+
 import "./example.css";
 
 const Example = (props: TooltipRootProps) => {
   return (
     <TooltipPrimitive.Root {...props}>
       <TooltipPrimitive.Trigger>
-        <span className="tooltip-trigger">Trigger</span>
+        <span className="tooltip-trigger">hover me</span>
       </TooltipPrimitive.Trigger>
       <TooltipPrimitive.Portal>
         <TooltipPrimitive.Content className="tooltip-content">
-          {/* <TooltipPrimitive.Arrow>arrow</TooltipPrimitive.Arrow> */}
-          <div className="tooltip-text">Tooltip Content</div>
+          <div className="tooltip-text">it is tooltip</div>
         </TooltipPrimitive.Content>
+        <TooltipPrimitive.Arrow asChild>
+          <ArrowDownFillIcon />
+        </TooltipPrimitive.Arrow>
       </TooltipPrimitive.Portal>
     </TooltipPrimitive.Root>
   );
