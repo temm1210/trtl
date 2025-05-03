@@ -33,6 +33,10 @@ const [TooltipPrimitiveProvider, useTooltipPrimitiveContext] =
   createContext<TooltipContextValue>();
 
 export interface TooltipRootProps {
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  delayDuration?: number;
   children?: React.ReactNode;
 }
 
@@ -40,13 +44,28 @@ const DEFAULT_ARROW_WIDTH = 20;
 const DEFAULT_ARROW_HEIGHT = 15;
 
 /************************************ ROOT *************************************/
-const TooltipRoot = ({ children }: TooltipRootProps) => {
+const TooltipRoot = ({
+  open: openProp,
+  defaultOpen,
+  onOpenChange,
+  delayDuration = 300,
+  children,
+}: TooltipRootProps) => {
   const arrowRef = useRef(null);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(defaultOpen ?? false);
+
+  const isControlled = openProp !== undefined;
+  const open = isControlled ? openProp : isOpen;
+
   const floatingElement = useFloating({
     placement: "top",
-    open: isOpen,
-    onOpenChange: setIsOpen,
+    open,
+    onOpenChange: (open) => {
+      if (!isControlled) {
+        setIsOpen(open);
+      }
+      onOpenChange?.(open);
+    },
     whileElementsMounted: autoUpdate,
     middleware: [
       shift({ padding: 5 }),
@@ -60,7 +79,7 @@ const TooltipRoot = ({ children }: TooltipRootProps) => {
 
   const click = useClick(floatingElement.context);
   const hover = useHover(floatingElement.context, {
-    delay: { open: 200, close: 100 },
+    delay: { open: delayDuration, close: 100 },
   });
 
   const { getReferenceProps, getFloatingProps } = useInteractions([

@@ -22,4 +22,5 @@ const Example = (props: TooltipRootProps) => {
   );
 };
 
+export type { TooltipRootProps };
 export default Example;
