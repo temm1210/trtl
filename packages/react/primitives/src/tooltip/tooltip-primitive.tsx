@@ -38,6 +38,7 @@ export interface TooltipRootProps {
   onOpenChange?: (open: boolean) => void;
   delayDuration?: number;
   children?: React.ReactNode;
+  side?: "top" | "right" | "bottom" | "left";
 }
 
 const DEFAULT_ARROW_WIDTH = 20;
@@ -46,6 +47,7 @@ const DEFAULT_ARROW_HEIGHT = 15;
 /************************************ ROOT *************************************/
 const TooltipRoot = ({
   open: openProp,
+  side = "top",
   defaultOpen,
   onOpenChange,
   delayDuration = 300,
@@ -58,7 +60,7 @@ const TooltipRoot = ({
   const open = isControlled ? openProp : isOpen;
 
   const floatingElement = useFloating({
-    placement: "top",
+    placement: side,
     open,
     onOpenChange: (open) => {
       if (!isControlled) {
@@ -142,7 +144,6 @@ const TooltipTrigger = ({
 
   return (
     <Comp
-      type="button"
       ref={refs.setReference}
       {...restProps}
       {...interaction.getReferenceProps()}

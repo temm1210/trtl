@@ -21,3 +21,15 @@ export const Base: StoryObj<Story> = {
 export const DefaultOpen: StoryObj<Story> = {
   render: () => <Tooltip defaultOpen />,
 };
+
+export const DelayDuration: StoryObj<Story> = {
+  argTypes: {
+    delayDuration: {
+      control: "number",
+    },
+  },
+  args: {
+    delayDuration: 1000,
+  },
+  render: (props) => <Tooltip {...props} />,
+};
