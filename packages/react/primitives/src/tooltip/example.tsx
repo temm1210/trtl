@@ -7,7 +7,7 @@ import "./example.css";
 const Example = (props: TooltipRootProps) => {
   return (
     <TooltipPrimitive.Root {...props}>
-      <TooltipPrimitive.Trigger>
+      <TooltipPrimitive.Trigger asChild>
         <span className="tooltip-trigger">hover me</span>
       </TooltipPrimitive.Trigger>
       <TooltipPrimitive.Portal>

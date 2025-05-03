@@ -8,7 +8,7 @@ import {
   FloatingPortalProps,
   offset,
   shift,
-  useClick,
+  useDismiss,
   useFloating,
   UseFloatingReturn,
   useHover,
@@ -77,14 +77,14 @@ const TooltipRoot = ({
     ],
   });
 
-  const click = useClick(floatingElement.context);
+  const dismiss = useDismiss(floatingElement.context);
   const hover = useHover(floatingElement.context, {
     delay: { open: delayDuration, close: 100 },
   });
 
   const { getReferenceProps, getFloatingProps } = useInteractions([
     hover,
-    click,
+    dismiss,
   ]);
 
   const arrowX = floatingElement.middlewareData.arrow?.x ?? 0;
@@ -126,21 +126,29 @@ const TooltipRoot = ({
 
 /************************************ TRIGGER *************************************/
 export interface TooltipTriggerProps
-  extends React.ComponentPropsWithRef<"button"> {}
+  extends React.ComponentPropsWithRef<"button"> {
+  asChild?: boolean;
+}
 
-const TooltipTrigger = ({ children, ...restProps }: TooltipTriggerProps) => {
+const TooltipTrigger = ({
+  children,
+  asChild,
+  ...restProps
+}: TooltipTriggerProps) => {
   const { floatingElement, interaction } = useTooltipPrimitiveContext();
   const { refs } = floatingElement;
 
+  const Comp = asChild ? Slot : "button";
+
   return (
-    <button
+    <Comp
       type="button"
       ref={refs.setReference}
       {...restProps}
       {...interaction.getReferenceProps()}
     >
       {children}
-    </button>
+    </Comp>
   );
 };
 
@@ -158,6 +166,7 @@ const TooltipPortal = ({ children, ...restProps }: TooltipPortalProps) => {
 /************************************ CONTENT *************************************/
 export interface TooltipContentProps
   extends React.ComponentPropsWithRef<"div"> {}
+
 const TooltipContent = ({
   children,
   style,
