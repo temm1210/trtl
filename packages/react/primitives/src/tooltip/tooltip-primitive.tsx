@@ -34,6 +34,7 @@ const [TooltipPrimitiveProvider, useTooltipPrimitiveContext] =
 
 export interface TooltipRootProps {
   open?: boolean;
+  offset?: number;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   delayDuration?: number;
@@ -48,6 +49,7 @@ const DEFAULT_ARROW_HEIGHT = 15;
 const TooltipRoot = ({
   open: openProp,
   side = "top",
+  offset: offsetProp = 0,
   defaultOpen,
   onOpenChange,
   delayDuration = 300,
@@ -71,7 +73,7 @@ const TooltipRoot = ({
     whileElementsMounted: autoUpdate,
     middleware: [
       shift({ padding: 5 }),
-      offset(DEFAULT_ARROW_HEIGHT),
+      offset(DEFAULT_ARROW_HEIGHT + offsetProp),
       flip({ padding: 5 }),
       arrow({
         element: arrowRef,
@@ -154,13 +156,21 @@ const TooltipTrigger = ({
 };
 
 /************************************ PORTAL *************************************/
-export interface TooltipPortalProps extends FloatingPortalProps {}
+export interface TooltipPortalProps extends FloatingPortalProps {
+  container?: HTMLElement;
+}
 
-const TooltipPortal = ({ children, ...restProps }: TooltipPortalProps) => {
+const TooltipPortal = ({
+  children,
+  container = document.body,
+  ...restProps
+}: TooltipPortalProps) => {
   const { isOpen } = useTooltipPrimitiveContext();
 
   return isOpen ? (
-    <FloatingPortal {...restProps}>{children}</FloatingPortal>
+    <FloatingPortal root={container} {...restProps}>
+      {children}
+    </FloatingPortal>
   ) : null;
 };
 
