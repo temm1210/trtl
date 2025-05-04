@@ -190,6 +190,7 @@ const TooltipContent = ({
 
   return (
     <div
+      role="tooltip"
       ref={refs.setFloating}
       style={floatingStyles}
       {...interaction.getFloatingProps()}
