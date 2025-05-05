@@ -1,3 +1,5 @@
+import { act } from "react";
+
 import { render } from "@rtl/react-utils";
 import { waitForElementToBeRemoved } from "@testing-library/react";
 
@@ -17,7 +19,7 @@ const Tooltip = (props: TooltipRootProps) => {
         <span data-testid="test-trigger">trigger</span>
       </TooltipTrigger>
       <TooltipPortal>
-        <TooltipContent data-testid="test-content">
+        <TooltipContent>
           <TooltipArrow data-testid="test-arrow" />
           <div>Content</div>
         </TooltipContent>
@@ -27,30 +29,41 @@ const Tooltip = (props: TooltipRootProps) => {
 };
 
 describe("Tooltip primitive tests", () => {
-  test("delayDuration should work correctly", async () => {
-    // https://github.com/testing-library/dom-testing-library/issues/987
+  test("open delayDuration prop should work correctly", async () => {
+    // https://github.com/testing-library/dom-testing-library/issues/987#issuecomment-1266266801
     vi.useFakeTimers({ shouldAdvanceTime: true });
 
-    const DELAY_TIME = 2000;
+    const DELAY_TIME = 1500;
     const {
       userEvent: user,
       getByTestId,
+      queryByRole,
+      getByRole,
       queryByTestId,
-      findByTestId,
     } = render(<Tooltip delayDuration={DELAY_TIME} />, {
       advanceTimers: vi.advanceTimersByTime,
     });
 
     const trigger = getByTestId("test-trigger");
-    expect(queryByTestId("test-content")).toBeNull();
 
     await user.hover(trigger);
-    vi.advanceTimersByTime(DELAY_TIME);
-    expect(await findByTestId("test-content")).toBeVisible();
+    expect(queryByTestId("test-content")).not.toBeInTheDocument();
+
+    /**
+     * https://github.com/vitest-dev/vitest/issues/1983#issuecomment-1238794400
+     */
+    act(() => {
+      vi.advanceTimersByTime(DELAY_TIME);
+    });
+    expect(getByRole("tooltip")).toBeInTheDocument();
 
     await user.unhover(trigger);
-    await waitForElementToBeRemoved(() => queryByTestId("test-content"));
-    expect(queryByTestId("test-content")).not.toBeInTheDocument();
+    expect(getByRole("tooltip")).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(DELAY_TIME);
+    });
+    await waitForElementToBeRemoved(() => queryByRole("tooltip"));
 
     vi.useRealTimers();
   });

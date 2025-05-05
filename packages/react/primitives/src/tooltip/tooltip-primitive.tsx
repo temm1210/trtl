@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import {
   arrow,
   autoUpdate,
+  Delay,
   flip,
   FloatingPortal,
   FloatingPortalProps,
@@ -37,7 +38,7 @@ export interface TooltipRootProps {
   offset?: number;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  delayDuration?: number;
+  delayDuration?: Delay;
   children?: React.ReactNode;
   side?: "top" | "right" | "bottom" | "left";
 }
@@ -83,7 +84,7 @@ const TooltipRoot = ({
 
   const dismiss = useDismiss(floatingElement.context);
   const hover = useHover(floatingElement.context, {
-    delay: { open: delayDuration, close: 100 },
+    delay: delayDuration,
   });
 
   const { getReferenceProps, getFloatingProps } = useInteractions([
