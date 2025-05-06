@@ -62,7 +62,7 @@ const TooltipRoot = ({
   const [isOpen, setIsOpen] = useState(defaultOpen ?? false);
 
   const isControlled = openProp !== undefined;
-  const open = isControlled ? openProp : isOpen;
+  const open = disabled ? false : isControlled ? openProp : isOpen;
 
   const floatingElement = useFloating({
     placement: side,
@@ -87,7 +87,6 @@ const TooltipRoot = ({
   const dismiss = useDismiss(floatingElement.context);
   const hover = useHover(floatingElement.context, {
     delay: delayDuration,
-    enabled: !disabled,
   });
 
   const { getReferenceProps, getFloatingProps } = useInteractions([

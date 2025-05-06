@@ -38,10 +38,5 @@ export const Disabled: StoryObj<Story> = {
   args: {
     disabled: true,
   },
-  parameters: {
-    controls: {
-      include: ["disabled"],
-    },
-  },
   render: (props) => <Tooltip {...props} />,
 };

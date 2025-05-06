@@ -8,6 +8,7 @@ import {
   TooltipContent,
   TooltipPortal,
   TooltipRoot,
+  TooltipRootProps,
   TooltipTrigger,
 } from "./tooltip-primitive";
 
@@ -131,5 +132,37 @@ describe("Tooltip primitive tests", () => {
     await waitForElementToBeRemoved(() => queryByRole("tooltip"));
 
     vi.useRealTimers();
+  });
+  test("disabled", async () => {
+    const Tooltip = (props: TooltipRootProps) => {
+      return (
+        <TooltipRoot disabled delayDuration={0} {...props}>
+          <TooltipTrigger asChild>
+            <span data-testid="test-trigger">trigger</span>
+          </TooltipTrigger>
+          <TooltipPortal>
+            <TooltipContent>
+              <TooltipArrow data-testid="test-arrow" />
+              <div>Content</div>
+            </TooltipContent>
+          </TooltipPortal>
+        </TooltipRoot>
+      );
+    };
+
+    const { userEvent, getByTestId, queryByRole, rerender } = render(
+      <Tooltip />,
+    );
+
+    const trigger = getByTestId("test-trigger");
+
+    await userEvent.hover(trigger);
+    expect(queryByRole("tooltip")).not.toBeInTheDocument();
+
+    rerender(<Tooltip open disabled />);
+    expect(queryByRole("tooltip")).not.toBeInTheDocument();
+
+    rerender(<Tooltip defaultOpen disabled />);
+    expect(queryByRole("tooltip")).not.toBeInTheDocument();
   });
 });
