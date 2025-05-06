@@ -37,6 +37,7 @@ export interface TooltipRootProps {
   open?: boolean;
   offset?: number;
   defaultOpen?: boolean;
+  disabled?: boolean;
   onOpenChange?: (open: boolean) => void;
   delayDuration?: Delay;
   children?: React.ReactNode;
@@ -52,6 +53,7 @@ const TooltipRoot = ({
   side = "top",
   offset: offsetProp = 0,
   defaultOpen,
+  disabled = false,
   onOpenChange,
   delayDuration = 300,
   children,
@@ -85,6 +87,7 @@ const TooltipRoot = ({
   const dismiss = useDismiss(floatingElement.context);
   const hover = useHover(floatingElement.context, {
     delay: delayDuration,
+    enabled: !disabled,
   });
 
   const { getReferenceProps, getFloatingProps } = useInteractions([

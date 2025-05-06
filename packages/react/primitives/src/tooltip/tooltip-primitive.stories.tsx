@@ -33,3 +33,15 @@ export const DelayDuration: StoryObj<Story> = {
   },
   render: (props) => <Tooltip {...props} />,
 };
+
+export const Disabled: StoryObj<Story> = {
+  args: {
+    disabled: true,
+  },
+  parameters: {
+    controls: {
+      include: ["disabled"],
+    },
+  },
+  render: (props) => <Tooltip {...props} />,
+};
