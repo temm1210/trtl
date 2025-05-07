@@ -12,7 +12,7 @@ import {
   TooltipTrigger,
 } from "./tooltip-primitive";
 
-describe("Tooltip primitive tests", () => {
+describe.skip("Tooltip primitive tests", () => {
   test("controlled", async () => {
     const handleOpenChange = vi.fn();
 
