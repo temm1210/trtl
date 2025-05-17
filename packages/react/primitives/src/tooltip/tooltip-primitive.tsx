@@ -9,7 +9,11 @@ import {
 } from "@floating-ui/react-dom";
 import { createContext, Portal, Slot } from "@rtl/react-utils";
 
+type Status = "mounted" | "unmounted" | "entering" | "exiting";
+
 interface TooltipContextValue {
+  status: Status;
+  setStatus: (status: Status) => void;
   open: boolean;
   placement: "top" | "right" | "bottom" | "left";
   onOpenChange: (open: boolean) => void;
@@ -38,6 +42,7 @@ const TooltipRoot = ({
   defaultOpen,
 }: TooltipRootProps) => {
   const [isOpen, setIsOpen] = React.useState(defaultOpen ?? false);
+  const [status, setStatus] = React.useState<Status>("unmounted");
 
   const isControlled = openProp !== undefined;
   const open = isControlled ? openProp : isOpen;
@@ -53,6 +58,9 @@ const TooltipRoot = ({
   return (
     <TooltipPrimitiveProvider
       value={{
+        status,
+        setStatus,
+        // open: status === "entering" || status === "mounted"
         open,
         placement,
         onOpenChange: handleOnOpenChange,
@@ -73,11 +81,20 @@ const TooltipTrigger = ({ children, asChild }: TooltipTriggerProps) => {
   const Comp = asChild ? Slot : "button";
   const ctx = useTooltipPrimitiveContext();
 
+  const { setStatus } = ctx;
+
   const handlePointerEnter = () => {
     ctx.onOpenChange(true);
+    setStatus("entering");
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => ctx.setStatus("mounted"));
+    });
   };
 
   const handlePointerLeave = () => {
+    console.log("leave");
+    ctx.setStatus("unmounted");
     ctx.onOpenChange(false);
   };
 
@@ -101,9 +118,9 @@ const TooltipPortal = ({
   container = document.body,
   children,
 }: TooltipPortalProps) => {
-  const { open } = useTooltipPrimitiveContext();
+  const ctx = useTooltipPrimitiveContext();
 
-  return open ? <Portal container={container}>{children}</Portal> : null;
+  return ctx.open ? <Portal container={container}>{children}</Portal> : null;
 };
 
 /************************************ CONTENT *************************************/
@@ -115,17 +132,26 @@ const TooltipContent = ({
   style,
   ...restProps
 }: TooltipContentProps) => {
-  const { open, placement } = useTooltipPrimitiveContext();
+  const ctx = useTooltipPrimitiveContext();
 
   const { floatingStyles } = useFloating({
-    placement,
-    open,
+    placement: ctx.placement,
+    open: ctx.open,
     whileElementsMounted: autoUpdate,
     middleware: [shift({ padding: 5 }), offset(10), flip({ padding: 5 })],
   });
 
+  const attr = {
+    "data-status": ctx.status === "entering" ? "enter" : undefined,
+  };
+
   return (
-    <div role="tooltip" style={{ ...floatingStyles, ...style }} {...restProps}>
+    <div
+      role="tooltip"
+      style={{ ...floatingStyles, ...style }}
+      {...restProps}
+      {...attr}
+    >
       {children}
     </div>
   );
