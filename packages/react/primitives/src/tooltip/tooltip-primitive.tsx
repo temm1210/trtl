@@ -99,8 +99,14 @@ const TooltipTrigger = ({ children, asChild }: TooltipTriggerProps) => {
   };
 
   const handlePointerLeave = () => {
-    ctx.setStatus("unmounted");
-    ctx.closeTooltip();
+    ctx.setStatus("exiting");
+  };
+
+  const handleTransitionEnd = () => {
+    if (ctx.status === "exiting") {
+      ctx.setStatus("unmounted");
+      ctx.closeTooltip();
+    }
   };
 
   return (
@@ -108,6 +114,7 @@ const TooltipTrigger = ({ children, asChild }: TooltipTriggerProps) => {
       ref={ctx.setAnchor}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
+      onTransitionEnd={handleTransitionEnd}
     >
       {children}
     </Comp>
@@ -156,22 +163,13 @@ const TooltipContent = ({
     middleware: [shift({ padding: 5 }), offset(10), flip({ padding: 5 })],
   });
 
-  const attr = {
-    "data-status":
-      ctx.status === "entering"
-        ? "enter"
-        : ctx.status === "unmounted"
-          ? "exit"
-          : undefined,
-  };
-
   return (
     <Comp
       role="tooltip"
       ref={mergeRefs([refProp, refs.setFloating])}
       style={{ ...floatingStyles, ...style }}
+      data-status={ctx.status}
       {...restProps}
-      {...attr}
     >
       {children}
     </Comp>

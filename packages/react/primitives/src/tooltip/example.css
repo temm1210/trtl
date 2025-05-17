@@ -18,8 +18,8 @@
   opacity: 1;
   transform: scale(1);
 
-  &[data-status="enter"],
-  &[data-status="exit"] {
+  &[data-status="entering"],
+  &[data-status="exiting"] {
     opacity: 0;
     transform: scale(0.7);
   }
