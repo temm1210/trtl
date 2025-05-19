@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import {
+  arrow,
   autoUpdate,
   flip,
   offset,
@@ -14,12 +15,11 @@ type Status = "mounted" | "unmounted" | "entering" | "exiting";
 interface TooltipContextValue {
   status: Status;
   setStatus: (status: Status) => void;
-  open: boolean;
-  placement: "top" | "right" | "bottom" | "left";
-  openTooltip: () => void;
-  closeTooltip: () => void;
   anchor: HTMLElement | null;
   setAnchor: (anchor: HTMLElement | null) => void;
+  open: boolean;
+  openTooltip: () => void;
+  closeTooltip: () => void;
 }
 
 const [TooltipPrimitiveProvider, useTooltipPrimitiveContext] =
@@ -33,7 +33,6 @@ export interface TooltipRootProps {
   onOpenChange?: (open: boolean) => void;
   delayDuration?: number;
   children?: React.ReactNode;
-  placement?: TooltipContextValue["placement"];
 }
 
 /************************************ ROOT *************************************/
@@ -41,7 +40,6 @@ const TooltipRoot = ({
   children,
   open: openProp,
   onOpenChange: onOpenChangeProp,
-  placement = "top",
   defaultOpen,
 }: TooltipRootProps) => {
   const [isOpen, setIsOpen] = React.useState(defaultOpen ?? false);
@@ -71,7 +69,6 @@ const TooltipRoot = ({
         openTooltip: handleOpenTooltip,
         closeTooltip: handleCloseChange,
         open,
-        placement,
       }}
     >
       {children}
@@ -136,10 +133,25 @@ const TooltipPortal = ({
   return ctx.open ? <Portal container={container}>{children}</Portal> : null;
 };
 
+/************************************ CONTENT CONTEXT*************************************/
+
+type Placement = "top" | "right" | "bottom" | "left";
+interface TooltipContentContextValue {
+  arrow: HTMLElement | null;
+  setArrow: (arrow: HTMLElement | null) => void;
+  arrowX?: number;
+  arrowY?: number;
+  placement: Placement;
+}
+
+const [TooltipPrimitiveContentProvider, useTooltipPrimitiveContentContext] =
+  createContext<TooltipContentContextValue>();
+
 /************************************ CONTENT *************************************/
 export interface TooltipContentProps
   extends React.ComponentPropsWithRef<"div"> {
   asChild?: boolean;
+  placement?: Placement;
 }
 
 const TooltipContent = ({
@@ -147,32 +159,57 @@ const TooltipContent = ({
   style,
   ref: refProp,
   asChild = false,
+  placement = "top",
   ...restProps
 }: TooltipContentProps) => {
   const Comp = asChild ? Slot : "div";
   const ctx = useTooltipPrimitiveContext();
 
-  const { floatingStyles, refs } = useFloating({
-    placement: ctx.placement,
+  const [arrowELement, setArrowElement] = React.useState<HTMLElement | null>(
+    null,
+  );
+
+  const { floatingStyles, refs, middlewareData } = useFloating({
+    placement,
     elements: {
       reference: ctx.anchor,
     },
     transform: false,
     open: ctx.open,
     whileElementsMounted: autoUpdate,
-    middleware: [shift({ padding: 5 }), offset(10), flip({ padding: 5 })],
+    middleware: [
+      shift({ padding: 5 }),
+      offset(10),
+      flip({ padding: 5 }),
+      arrow({
+        element: arrowELement,
+      }),
+    ],
   });
 
+  const arrowX = middlewareData.arrow?.x;
+  const arrowY = middlewareData.arrow?.y;
+
   return (
-    <Comp
-      role="tooltip"
-      ref={mergeRefs([refProp, refs.setFloating])}
-      style={{ ...floatingStyles, ...style }}
-      data-status={ctx.status}
-      {...restProps}
+    <TooltipPrimitiveContentProvider
+      value={{
+        arrow: arrowELement,
+        setArrow: setArrowElement,
+        arrowX,
+        arrowY,
+        placement,
+      }}
     >
-      {children}
-    </Comp>
+      <Comp
+        role="tooltip"
+        ref={mergeRefs([refProp, refs.setFloating])}
+        style={{ ...floatingStyles, ...style }}
+        data-status={ctx.status}
+        {...restProps}
+      >
+        {children}
+      </Comp>
+    </TooltipPrimitiveContentProvider>
   );
 };
 
@@ -184,11 +221,42 @@ export interface TooltipArrowProps extends React.ComponentPropsWithRef<"div"> {
 const TooltipArrow = ({
   asChild = false,
   children,
+  style,
   ...restProps
 }: TooltipArrowProps) => {
   const Comp = asChild ? Slot : "div";
+  const contentCtx = useTooltipPrimitiveContentContext();
 
-  return <Comp {...restProps}>{children}</Comp>;
+  const transformStyle = {
+    top: "translateY(100%)",
+    right: "translateY(50%) rotate(90deg) translateX(-50%)",
+    bottom: `rotate(180deg)`,
+    left: "translateY(50%) rotate(-90deg) translateX(50%)",
+  };
+
+  const OPPOSITE_SIDE: Record<Placement, Placement> = {
+    top: "bottom",
+    right: "left",
+    bottom: "top",
+    left: "right",
+  };
+
+  return (
+    <Comp
+      ref={contentCtx.setArrow}
+      {...restProps}
+      style={{
+        position: "absolute",
+        left: contentCtx.arrowX,
+        top: contentCtx.arrowY,
+        transform: transformStyle[contentCtx.placement],
+        [OPPOSITE_SIDE[contentCtx.placement]]: 0,
+        ...style,
+      }}
+    >
+      {children}
+    </Comp>
+  );
 };
 
 export {
