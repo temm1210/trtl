@@ -227,18 +227,25 @@ const TooltipArrow = ({
   const Comp = asChild ? Slot : "div";
   const contentCtx = useTooltipPrimitiveContentContext();
 
-  const transformStyle = {
+  const TRANSFORM: Record<Placement, string> = {
     top: "translateY(100%)",
-    right: "translateY(50%) rotate(90deg) translateX(-50%)",
+    right: "translateY(50%) rotate(90deg) translateX(50%)",
     bottom: `rotate(180deg)`,
     left: "translateY(50%) rotate(-90deg) translateX(50%)",
   };
 
-  const OPPOSITE_SIDE: Record<Placement, Placement> = {
+  const OPPOSITE_PLACEMENT: Record<Placement, Placement> = {
     top: "bottom",
     right: "left",
     bottom: "top",
     left: "right",
+  };
+
+  const TRANSFORM_ORIGIN: Record<Placement, string> = {
+    top: "",
+    right: "0 0",
+    bottom: "center 0",
+    left: "100% 0",
   };
 
   return (
@@ -249,8 +256,9 @@ const TooltipArrow = ({
         position: "absolute",
         left: contentCtx.arrowX,
         top: contentCtx.arrowY,
-        transform: transformStyle[contentCtx.placement],
-        [OPPOSITE_SIDE[contentCtx.placement]]: 0,
+        transform: TRANSFORM[contentCtx.placement],
+        transformOrigin: TRANSFORM_ORIGIN[contentCtx.placement],
+        [OPPOSITE_PLACEMENT[contentCtx.placement]]: 0,
         ...style,
       }}
     >

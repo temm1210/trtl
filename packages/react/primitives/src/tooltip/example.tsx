@@ -11,7 +11,7 @@ const Example = (props: TooltipRootProps) => {
         <span className="tooltip-trigger">hover me</span>
       </TooltipPrimitive.Trigger>
       <TooltipPrimitive.Portal>
-        <TooltipPrimitive.Content className="tooltip-content">
+        <TooltipPrimitive.Content placement="right" className="tooltip-content">
           <div className="tooltip-text">it is tooltip</div>
           <TooltipPrimitive.Arrow asChild>
             <ArrowDownFillIcon style={{ width: "10px", height: "10px" }} />
