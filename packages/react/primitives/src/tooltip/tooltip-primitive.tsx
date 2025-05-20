@@ -84,33 +84,29 @@ export interface TooltipTriggerProps
 
 const TooltipTrigger = ({ children, asChild }: TooltipTriggerProps) => {
   const Comp = asChild ? Slot : "button";
-  const ctx = useTooltipPrimitiveContext();
+  const { openTooltip, setStatus, closeTooltip, setAnchor } =
+    useTooltipPrimitiveContext();
 
   const handlePointerEnter = () => {
-    ctx.openTooltip();
-    ctx.setStatus("entering");
+    openTooltip();
+    setStatus("entering");
 
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => ctx.setStatus("mounted"));
+      requestAnimationFrame(() => setStatus("mounted"));
     });
   };
 
-  // const handlePointerLeave = () => {
-  //   ctx.setStatus("exiting");
-  // };
-
   const handleTransitionEnd = () => {
-    if (ctx.status === "exiting") {
-      ctx.setStatus("unmounted");
-      ctx.closeTooltip();
+    if (status === "exiting") {
+      setStatus("unmounted");
+      closeTooltip();
     }
   };
 
   return (
     <Comp
-      ref={ctx.setAnchor}
+      ref={setAnchor}
       onPointerEnter={handlePointerEnter}
-      // onPointerLeave={handlePointerLeave}
       onTransitionEnd={handleTransitionEnd}
     >
       {children}
@@ -128,9 +124,9 @@ const TooltipPortal = ({
   container = document.body,
   children,
 }: TooltipPortalProps) => {
-  const ctx = useTooltipPrimitiveContext();
+  const { open } = useTooltipPrimitiveContext();
 
-  return ctx.open ? <Portal container={container}>{children}</Portal> : null;
+  return open ? <Portal container={container}>{children}</Portal> : null;
 };
 
 /************************************ CONTENT CONTEXT*************************************/
@@ -163,7 +159,7 @@ const TooltipContent = ({
   ...restProps
 }: TooltipContentProps) => {
   const Comp = asChild ? Slot : "div";
-  const ctx = useTooltipPrimitiveContext();
+  const { anchor, open, status, setStatus } = useTooltipPrimitiveContext();
 
   const [arrowELement, setArrowElement] = React.useState<HTMLElement | null>(
     null,
@@ -172,10 +168,10 @@ const TooltipContent = ({
   const { floatingStyles, refs, middlewareData } = useFloating({
     placement,
     elements: {
-      reference: ctx.anchor,
+      reference: anchor,
     },
     transform: false,
-    open: ctx.open,
+    open,
     whileElementsMounted: autoUpdate,
     middleware: [
       shift({ padding: 5 }),
@@ -190,13 +186,12 @@ const TooltipContent = ({
   const arrowX = middlewareData.arrow?.x;
   const arrowY = middlewareData.arrow?.y;
 
-  const { anchor, setStatus, status } = ctx;
   const content = refs.floating.current;
 
   React.useEffect(() => {
     if (status !== "mounted") return;
 
-    const onPointerMove = (ev: PointerEvent) => {
+    const handlePointerMove = (ev: PointerEvent) => {
       if (!anchor || !content) {
         setStatus("exiting");
         return;
@@ -205,38 +200,28 @@ const TooltipContent = ({
       const anchorRect = anchor.getBoundingClientRect();
       const contentRect = content.getBoundingClientRect();
 
-      let isPointerRangeGap: boolean;
+      const gapRect = getGapFromRectByPlacement(
+        anchorRect,
+        contentRect,
+        placement,
+      );
 
-      if (placement === "bottom") {
-        isPointerRangeGap =
-          ev.clientX >= contentRect.left &&
-          ev.clientX <= contentRect.right &&
-          ev.clientY <= contentRect.top &&
-          ev.clientY >= anchorRect.bottom;
-      } else if (placement === "top") {
-        isPointerRangeGap =
-          ev.clientX >= contentRect.left &&
-          ev.clientX <= contentRect.right &&
-          ev.clientY <= anchorRect.top &&
-          ev.clientY >= contentRect.bottom;
-      } else if (placement === "right") {
-        isPointerRangeGap =
-          ev.clientX <= contentRect.left &&
-          ev.clientX >= anchorRect.right &&
-          ev.clientY >= contentRect.top &&
-          ev.clientY <= contentRect.bottom;
-      } else if (placement === "left") {
-        isPointerRangeGap =
-          ev.clientX <= anchorRect.left &&
-          ev.clientX >= contentRect.right &&
-          ev.clientY >= contentRect.top &&
-          ev.clientY <= contentRect.bottom;
-      } else {
-        isPointerRangeGap = false;
+      if (!gapRect) {
+        setStatus("exiting");
+        return;
       }
 
+      const pointerX = ev.clientX;
+      const pointerY = ev.clientY;
+
+      const isPointerRangeGap =
+        pointerX >= gapRect.minX &&
+        pointerX <= gapRect.maxX &&
+        pointerY >= gapRect.minY &&
+        pointerY <= gapRect.maxY;
+
       const isPointerInRangeElement = [content, anchor].some((element) =>
-        element.contains(document.elementFromPoint(ev.clientX, ev.clientY)),
+        element.contains(document.elementFromPoint(pointerX, pointerY)),
       );
 
       if (!isPointerInRangeElement && !isPointerRangeGap) {
@@ -244,9 +229,11 @@ const TooltipContent = ({
       }
     };
 
-    document.addEventListener("pointermove", onPointerMove, { passive: true });
+    document.addEventListener("pointermove", handlePointerMove, {
+      passive: true,
+    });
     return () => {
-      document.removeEventListener("pointermove", onPointerMove);
+      document.removeEventListener("pointermove", handlePointerMove);
     };
   }, [anchor, content, placement, setStatus, status]);
 
@@ -264,7 +251,7 @@ const TooltipContent = ({
         role="tooltip"
         ref={mergeRefs([refProp, refs.setFloating])}
         style={{ ...floatingStyles, ...style }}
-        data-status={ctx.status}
+        data-status={status}
         {...restProps}
       >
         {children}
@@ -285,7 +272,8 @@ const TooltipArrow = ({
   ...restProps
 }: TooltipArrowProps) => {
   const Comp = asChild ? Slot : "div";
-  const contentCtx = useTooltipPrimitiveContentContext();
+  const { arrowX, arrowY, setArrow, placement } =
+    useTooltipPrimitiveContentContext();
 
   const TRANSFORM: Record<Placement, string> = {
     top: "translateY(100%)",
@@ -310,15 +298,15 @@ const TooltipArrow = ({
 
   return (
     <Comp
-      ref={contentCtx.setArrow}
+      ref={setArrow}
       {...restProps}
       style={{
         position: "absolute",
-        left: contentCtx.arrowX,
-        top: contentCtx.arrowY,
-        transform: TRANSFORM[contentCtx.placement],
-        transformOrigin: TRANSFORM_ORIGIN[contentCtx.placement],
-        [OPPOSITE_PLACEMENT[contentCtx.placement]]: 0,
+        left: arrowX,
+        top: arrowY,
+        transform: TRANSFORM[placement],
+        transformOrigin: TRANSFORM_ORIGIN[placement],
+        [OPPOSITE_PLACEMENT[placement]]: 0,
         ...style,
       }}
     >
@@ -326,6 +314,45 @@ const TooltipArrow = ({
     </Comp>
   );
 };
+
+function getGapFromRectByPlacement(
+  anchor: DOMRect,
+  content: DOMRect,
+  placement: Placement,
+) {
+  switch (placement) {
+    case "bottom":
+      return {
+        minX: content.left,
+        maxX: content.right,
+        minY: anchor.bottom,
+        maxY: content.top,
+      };
+    case "top":
+      return {
+        minX: content.left,
+        maxX: content.right,
+        minY: content.bottom,
+        maxY: anchor.top,
+      };
+    case "right":
+      return {
+        minX: anchor.right,
+        maxX: content.left,
+        minY: content.top,
+        maxY: content.bottom,
+      };
+    case "left":
+      return {
+        minX: content.right,
+        maxX: anchor.left,
+        minY: content.top,
+        maxY: content.bottom,
+      };
+    default:
+      return null;
+  }
+}
 
 export {
   TooltipArrow,
