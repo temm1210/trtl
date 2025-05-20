@@ -95,9 +95,9 @@ const TooltipTrigger = ({ children, asChild }: TooltipTriggerProps) => {
     });
   };
 
-  const handlePointerLeave = () => {
-    ctx.setStatus("exiting");
-  };
+  // const handlePointerLeave = () => {
+  //   ctx.setStatus("exiting");
+  // };
 
   const handleTransitionEnd = () => {
     if (ctx.status === "exiting") {
@@ -110,7 +110,7 @@ const TooltipTrigger = ({ children, asChild }: TooltipTriggerProps) => {
     <Comp
       ref={ctx.setAnchor}
       onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
+      // onPointerLeave={handlePointerLeave}
       onTransitionEnd={handleTransitionEnd}
     >
       {children}
@@ -190,6 +190,66 @@ const TooltipContent = ({
   const arrowX = middlewareData.arrow?.x;
   const arrowY = middlewareData.arrow?.y;
 
+  const { anchor, setStatus, status } = ctx;
+  const content = refs.floating.current;
+
+  React.useEffect(() => {
+    if (status !== "mounted") return;
+
+    const onPointerMove = (ev: PointerEvent) => {
+      if (!anchor || !content) {
+        setStatus("exiting");
+        return;
+      }
+
+      const anchorRect = anchor.getBoundingClientRect();
+      const contentRect = content.getBoundingClientRect();
+
+      let isPointerRangeGap: boolean;
+
+      if (placement === "bottom") {
+        isPointerRangeGap =
+          ev.clientX >= contentRect.left &&
+          ev.clientX <= contentRect.right &&
+          ev.clientY <= contentRect.top &&
+          ev.clientY >= anchorRect.bottom;
+      } else if (placement === "top") {
+        isPointerRangeGap =
+          ev.clientX >= contentRect.left &&
+          ev.clientX <= contentRect.right &&
+          ev.clientY <= anchorRect.top &&
+          ev.clientY >= contentRect.bottom;
+      } else if (placement === "right") {
+        isPointerRangeGap =
+          ev.clientX <= contentRect.left &&
+          ev.clientX >= anchorRect.right &&
+          ev.clientY >= contentRect.top &&
+          ev.clientY <= contentRect.bottom;
+      } else if (placement === "left") {
+        isPointerRangeGap =
+          ev.clientX <= anchorRect.left &&
+          ev.clientX >= contentRect.right &&
+          ev.clientY >= contentRect.top &&
+          ev.clientY <= contentRect.bottom;
+      } else {
+        isPointerRangeGap = false;
+      }
+
+      const isPointerInRangeElement = [content, anchor].some((element) =>
+        element.contains(document.elementFromPoint(ev.clientX, ev.clientY)),
+      );
+
+      if (!isPointerInRangeElement && !isPointerRangeGap) {
+        setStatus("exiting");
+      }
+    };
+
+    document.addEventListener("pointermove", onPointerMove, { passive: true });
+    return () => {
+      document.removeEventListener("pointermove", onPointerMove);
+    };
+  }, [anchor, content, placement, setStatus, status]);
+
   return (
     <TooltipPrimitiveContentProvider
       value={{
@@ -229,7 +289,7 @@ const TooltipArrow = ({
 
   const TRANSFORM: Record<Placement, string> = {
     top: "translateY(100%)",
-    right: "translateY(50%) rotate(90deg) translateX(50%)",
+    right: "translateY(50%) rotate(90deg) translateX(-50%)",
     bottom: `rotate(180deg)`,
     left: "translateY(50%) rotate(-90deg) translateX(50%)",
   };
