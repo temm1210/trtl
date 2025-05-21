@@ -18,6 +18,7 @@ interface TooltipContextValue {
   anchor: HTMLElement | null;
   setAnchor: (anchor: HTMLElement | null) => void;
   open: boolean;
+  disabled: boolean;
   openTooltip: () => void;
   closeTooltip: () => void;
 }
@@ -39,7 +40,7 @@ const TooltipRoot = ({
   children,
   open: openProp,
   onOpenChange: onOpenChangeProp,
-  // disabled,
+  disabled = false,
   // delayDuration,
   defaultOpen,
 }: TooltipRootProps) => {
@@ -48,7 +49,7 @@ const TooltipRoot = ({
   const [anchor, setAnchor] = React.useState<HTMLElement | null>(null);
 
   const isControlled = openProp !== undefined;
-  const open = isControlled ? openProp : isOpen;
+  const open = disabled ? false : isControlled ? openProp : isOpen;
 
   const handleOpenTooltip = React.useCallback(() => {
     setIsOpen(true);
@@ -67,6 +68,7 @@ const TooltipRoot = ({
         setAnchor,
         status,
         setStatus,
+        disabled,
         openTooltip: handleOpenTooltip,
         closeTooltip: handleCloseChange,
         open,

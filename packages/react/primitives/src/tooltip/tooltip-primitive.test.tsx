@@ -7,6 +7,7 @@ import {
   TooltipContent,
   TooltipPortal,
   TooltipRoot,
+  TooltipRootProps,
   TooltipTrigger,
 } from "./tooltip-primitive";
 
@@ -131,56 +132,53 @@ describe("Tooltip primitive tests", () => {
 
   //   vi.useRealTimers();
   // });
-  // test("disabled", async () => {
-  //   const Tooltip = (props: TooltipRootProps) => {
-  //     return (
-  //       <TooltipRoot disabled delayDuration={0} {...props}>
-  //         <TooltipTrigger asChild>
-  //           <span data-testid="test-trigger">trigger</span>
-  //         </TooltipTrigger>
-  //         <TooltipPortal>
-  //           <TooltipContent>
-  //             <TooltipArrow data-testid="test-arrow" />
-  //             <div>Content</div>
-  //           </TooltipContent>
-  //         </TooltipPortal>
-  //       </TooltipRoot>
-  //     );
-  //   };
+  test("disabled", async () => {
+    const Tooltip = (props: TooltipRootProps) => {
+      return (
+        <TooltipRoot disabled delayDuration={0} {...props}>
+          <TooltipTrigger asChild>
+            <span data-testid="test-trigger">trigger</span>
+          </TooltipTrigger>
+          <TooltipPortal>
+            <TooltipContent>
+              <TooltipArrow data-testid="test-arrow" />
+              <div>Content</div>
+            </TooltipContent>
+          </TooltipPortal>
+        </TooltipRoot>
+      );
+    };
 
-  //   const { userEvent, getByTestId, queryByRole, rerender } = render(
-  //     <Tooltip />,
-  //   );
+    const { userEvent, getByTestId, queryByRole, rerender } = render(
+      <Tooltip />,
+    );
 
-  //   await userEvent.hover(getByTestId("test-trigger"));
-  //   expect(queryByRole("tooltip")).not.toBeInTheDocument();
+    await userEvent.hover(getByTestId("test-trigger"));
+    expect(queryByRole("tooltip")).not.toBeInTheDocument();
 
-  //   rerender(<Tooltip open disabled />);
-  //   expect(queryByRole("tooltip")).not.toBeInTheDocument();
+    rerender(<Tooltip open disabled />);
+    expect(queryByRole("tooltip")).not.toBeInTheDocument();
 
-  //   rerender(<Tooltip defaultOpen disabled />);
-  //   expect(queryByRole("tooltip")).not.toBeInTheDocument();
-  // });
+    rerender(<Tooltip defaultOpen disabled />);
+    expect(queryByRole("tooltip")).not.toBeInTheDocument();
+  });
 
-  // test("defaultOpen", async () => {
-  //   const { getByRole, queryByRole, getByTestId } = render(
-  //     <TooltipRoot defaultOpen delayDuration={0}>
-  //       <TooltipTrigger asChild>
-  //         <span data-testid="test-trigger">trigger</span>
-  //       </TooltipTrigger>
-  //       <TooltipPortal>
-  //         <TooltipContent>
-  //           <TooltipArrow data-testid="test-arrow" />
-  //           <div>Content</div>
-  //         </TooltipContent>
-  //       </TooltipPortal>
-  //     </TooltipRoot>,
-  //   );
-  //   const tooltip = getByRole("tooltip");
+  test("defaultOpen", async () => {
+    const { getByRole } = render(
+      <TooltipRoot defaultOpen delayDuration={0}>
+        <TooltipTrigger asChild>
+          <span data-testid="test-trigger">trigger</span>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent>
+            <TooltipArrow data-testid="test-arrow" />
+            <div>Content</div>
+          </TooltipContent>
+        </TooltipPortal>
+      </TooltipRoot>,
+    );
+    const tooltip = getByRole("tooltip");
 
-  //   expect(tooltip).toBeInTheDocument();
-
-  //   fireEvent.mouseLeave(getByTestId("test-trigger"));
-  //   await waitForElementToBeRemoved(() => queryByRole("tooltip"));
-  // });
+    expect(tooltip).toBeInTheDocument();
+  });
 });
