@@ -1,6 +1,7 @@
 import React from "react";
 
 import { render } from "@rtl/react-utils";
+import { act } from "@testing-library/react";
 
 import {
   TooltipArrow,
@@ -87,51 +88,53 @@ describe("Tooltip primitive tests", () => {
     expect(queryByRole("tooltip")).not.toBeInTheDocument();
   });
 
-  // test("delayDuration prop should work correctly", async () => {
-  //   // https://github.com/testing-library/dom-testing-library/issues/987#issuecomment-1266266801
-  //   vi.useFakeTimers({ shouldAdvanceTime: true });
+  test("delayDuration prop should work correctly", async () => {
+    // https://github.com/testing-library/dom-testing-library/issues/987#issuecomment-1266266801
+    vi.useFakeTimers({ shouldAdvanceTime: true });
 
-  //   const DELAY_TIME = 1500;
-  //   const { userEvent, getByTestId, queryByRole, getByRole } = render(
-  //     <TooltipRoot delayDuration={DELAY_TIME}>
-  //       <TooltipTrigger asChild>
-  //         <span data-testid="test-trigger">trigger</span>
-  //       </TooltipTrigger>
-  //       <TooltipPortal>
-  //         <TooltipContent>
-  //           <TooltipArrow data-testid="test-arrow" />
-  //           <div>Content</div>
-  //         </TooltipContent>
-  //       </TooltipPortal>
-  //     </TooltipRoot>,
-  // {
-  //   advanceTimers: vi.advanceTimersByTime,
-  // },
-  //   );
+    const DELAY_TIME = 1500;
+    const { userEvent, getByTestId, queryByRole, getByRole } = render(
+      <TooltipRoot delayDuration={DELAY_TIME}>
+        <TooltipTrigger asChild>
+          <span data-testid="test-trigger">trigger</span>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent>
+            <TooltipArrow data-testid="test-arrow" />
+            <div>Content</div>
+          </TooltipContent>
+        </TooltipPortal>
+      </TooltipRoot>,
+      {
+        advanceTimers: vi.advanceTimersByTime,
+      },
+    );
 
-  //   const trigger = getByTestId("test-trigger");
+    const trigger = getByTestId("test-trigger");
 
-  //   await userEvent.hover(trigger);
-  //   expect(queryByRole("tooltip")).not.toBeInTheDocument();
+    await userEvent.hover(trigger);
+    expect(queryByRole("tooltip")).not.toBeInTheDocument();
 
-  //   /**
-  //    * https://github.com/vitest-dev/vitest/issues/1983#issuecomment-1238794400
-  //    */
-  //   act(() => {
-  //     vi.advanceTimersByTime(DELAY_TIME);
-  //   });
-  //   expect(getByRole("tooltip")).toBeInTheDocument();
+    /**
+     * https://github.com/vitest-dev/vitest/issues/1983#issuecomment-1238794400
+     */
+    act(() => {
+      vi.advanceTimersByTime(DELAY_TIME);
+    });
+    expect(getByRole("tooltip")).toBeInTheDocument();
 
-  //   await userEvent.unhover(trigger);
-  //   expect(getByRole("tooltip")).toBeInTheDocument();
+    await userEvent.unhover(trigger);
+    expect(getByRole("tooltip")).toBeInTheDocument();
 
-  //   act(() => {
-  //     vi.advanceTimersByTime(DELAY_TIME);
-  //   });
-  //   await waitForElementToBeRemoved(() => queryByRole("tooltip"));
+    act(() => {
+      vi.advanceTimersByTime(DELAY_TIME);
+    });
 
-  //   vi.useRealTimers();
-  // });
+    expect(queryByRole("tooltip")).not.toBeInTheDocument();
+
+    vi.useRealTimers();
+  });
+
   test("disabled", async () => {
     const Tooltip = (props: TooltipRootProps) => {
       return (

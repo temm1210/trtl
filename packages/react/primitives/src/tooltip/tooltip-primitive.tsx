@@ -19,6 +19,7 @@ interface TooltipContextValue {
   setAnchor: (anchor: HTMLElement | null) => void;
   open: boolean;
   disabled: boolean;
+  delayDuration: number;
   openTooltip: () => void;
   closeTooltip: () => void;
 }
@@ -41,7 +42,7 @@ const TooltipRoot = ({
   open: openProp,
   onOpenChange: onOpenChangeProp,
   disabled = false,
-  // delayDuration,
+  delayDuration = 0,
   defaultOpen,
 }: TooltipRootProps) => {
   const [isOpen, setIsOpen] = React.useState(defaultOpen ?? false);
@@ -68,6 +69,7 @@ const TooltipRoot = ({
         setAnchor,
         status,
         setStatus,
+        delayDuration,
         disabled,
         openTooltip: handleOpenTooltip,
         closeTooltip: handleCloseChange,
@@ -87,19 +89,28 @@ export interface TooltipTriggerProps
 
 const TooltipTrigger = ({ children, asChild }: TooltipTriggerProps) => {
   const Comp = asChild ? Slot : "button";
-  const { openTooltip, setStatus, setAnchor } = useTooltipPrimitiveContext();
+  const timerRef = React.useRef(0);
+
+  const { openTooltip, setStatus, setAnchor, delayDuration } =
+    useTooltipPrimitiveContext();
 
   const handlePointerEnter = () => {
-    openTooltip();
-    setStatus("entering");
+    window.clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => {
+      openTooltip();
+      setStatus("entering");
 
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => setStatus("mounted"));
-    });
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setStatus("mounted"));
+      });
+    }, delayDuration);
   };
 
   const handlePointerLeave = () => {
-    setStatus("exiting");
+    window.clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => {
+      setStatus("exiting");
+    }, delayDuration);
   };
 
   return (
