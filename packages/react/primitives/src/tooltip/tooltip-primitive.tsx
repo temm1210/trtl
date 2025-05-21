@@ -1,33 +1,27 @@
-import { useRef, useState } from "react";
+import * as React from "react";
 
 import {
   arrow,
   autoUpdate,
-  Delay,
   flip,
-  FloatingPortal,
-  FloatingPortalProps,
   offset,
   shift,
-  useDismiss,
   useFloating,
-  UseFloatingReturn,
-  useHover,
-  useInteractions,
-  UseInteractionsReturn,
-  useTransitionStyles,
-} from "@floating-ui/react";
-import { createContext, Slot } from "@rtl/react-utils";
+} from "@floating-ui/react-dom";
+import { createContext, mergeRefs, Portal, Slot } from "@rtl/react-utils";
+
+type Status = "mounted" | "unmounted" | "entering" | "exiting";
 
 interface TooltipContextValue {
-  floatingElement: UseFloatingReturn;
-  interaction: {
-    getReferenceProps: UseInteractionsReturn["getReferenceProps"];
-    getFloatingProps: UseInteractionsReturn["getFloatingProps"];
-  };
-  contentStyles: React.CSSProperties;
-  arrowRef: React.RefObject<HTMLDivElement | null>;
-  isOpen: boolean;
+  status: Status;
+  setStatus: (status: Status) => void;
+  anchor: HTMLElement | null;
+  setAnchor: (anchor: HTMLElement | null) => void;
+  open: boolean;
+  disabled: boolean;
+  delayDuration: number;
+  openTooltip: () => void;
+  closeTooltip: () => void;
 }
 
 const [TooltipPrimitiveProvider, useTooltipPrimitiveContext] =
@@ -35,95 +29,51 @@ const [TooltipPrimitiveProvider, useTooltipPrimitiveContext] =
 
 export interface TooltipRootProps {
   open?: boolean;
-  offset?: number;
   defaultOpen?: boolean;
   disabled?: boolean;
+  delayDuration?: number;
   onOpenChange?: (open: boolean) => void;
-  delayDuration?: Delay;
   children?: React.ReactNode;
-  side?: "top" | "right" | "bottom" | "left";
 }
-
-const DEFAULT_ARROW_WIDTH = 20;
-const DEFAULT_ARROW_HEIGHT = 15;
 
 /************************************ ROOT *************************************/
 const TooltipRoot = ({
-  open: openProp,
-  side = "top",
-  offset: offsetProp = 0,
-  defaultOpen,
-  disabled = false,
-  onOpenChange,
-  delayDuration = 300,
   children,
+  open: openProp,
+  onOpenChange: onOpenChangeProp,
+  disabled = false,
+  delayDuration = 0,
+  defaultOpen,
 }: TooltipRootProps) => {
-  const arrowRef = useRef(null);
-  const [isOpen, setIsOpen] = useState(defaultOpen ?? false);
+  const [isOpen, setIsOpen] = React.useState(defaultOpen ?? false);
+  const [status, setStatus] = React.useState<Status>("unmounted");
+  const [anchor, setAnchor] = React.useState<HTMLElement | null>(null);
 
   const isControlled = openProp !== undefined;
   const open = disabled ? false : isControlled ? openProp : isOpen;
 
-  const floatingElement = useFloating({
-    placement: side,
-    open,
-    onOpenChange: (open) => {
-      if (!isControlled) {
-        setIsOpen(open);
-      }
-      onOpenChange?.(open);
-    },
-    whileElementsMounted: autoUpdate,
-    middleware: [
-      shift({ padding: 5 }),
-      offset(DEFAULT_ARROW_HEIGHT + offsetProp),
-      flip({ padding: 5 }),
-      arrow({
-        element: arrowRef,
-      }),
-    ],
-  });
+  const handleOpenTooltip = React.useCallback(() => {
+    setIsOpen(true);
+    onOpenChangeProp?.(true);
+  }, [onOpenChangeProp]);
 
-  const dismiss = useDismiss(floatingElement.context);
-  const hover = useHover(floatingElement.context, {
-    delay: delayDuration,
-  });
-
-  const { getReferenceProps, getFloatingProps } = useInteractions([
-    hover,
-    dismiss,
-  ]);
-
-  const arrowX = floatingElement.middlewareData.arrow?.x ?? 0;
-  const arrowY = floatingElement.middlewareData.arrow?.y ?? 0;
-  const transformX = arrowX + DEFAULT_ARROW_WIDTH / 2;
-  const transformY = arrowY + DEFAULT_ARROW_HEIGHT;
-
-  const { isMounted, styles } = useTransitionStyles(floatingElement.context, {
-    initial: {
-      transform: "scale(0)",
-    },
-    common: ({ side }) => ({
-      transformOrigin: {
-        top: `${transformX}px calc(100% + ${DEFAULT_ARROW_HEIGHT}px)`,
-        bottom: `${transformX}px ${-DEFAULT_ARROW_HEIGHT}px`,
-        left: `calc(100% + ${DEFAULT_ARROW_HEIGHT}px) ${transformY}px`,
-        right: `${-DEFAULT_ARROW_HEIGHT}px ${transformY}px`,
-      }[side],
-    }),
-  });
+  const handleCloseChange = React.useCallback(() => {
+    setIsOpen(false);
+    onOpenChangeProp?.(false);
+  }, [onOpenChangeProp]);
 
   return (
     <TooltipPrimitiveProvider
       value={{
-        interaction: {
-          getReferenceProps,
-          getFloatingProps,
-        },
-        contentStyles: styles,
-        arrowRef,
-        floatingElement,
-        isOpen: isMounted,
+        anchor,
+        setAnchor,
+        status,
+        setStatus,
+        delayDuration,
+        disabled,
+        openTooltip: handleOpenTooltip,
+        closeTooltip: handleCloseChange,
+        open,
       }}
     >
       {children}
@@ -137,21 +87,37 @@ export interface TooltipTriggerProps
   asChild?: boolean;
 }
 
-const TooltipTrigger = ({
-  children,
-  asChild,
-  ...restProps
-}: TooltipTriggerProps) => {
-  const { floatingElement, interaction } = useTooltipPrimitiveContext();
-  const { refs } = floatingElement;
-
+const TooltipTrigger = ({ children, asChild }: TooltipTriggerProps) => {
   const Comp = asChild ? Slot : "button";
+  const timerRef = React.useRef(0);
+
+  const { openTooltip, setStatus, setAnchor, delayDuration } =
+    useTooltipPrimitiveContext();
+
+  const handlePointerEnter = () => {
+    window.clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => {
+      openTooltip();
+      setStatus("entering");
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setStatus("mounted"));
+      });
+    }, delayDuration);
+  };
+
+  const handlePointerLeave = () => {
+    window.clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => {
+      setStatus("exiting");
+    }, delayDuration);
+  };
 
   return (
     <Comp
-      ref={refs.setReference}
-      {...restProps}
-      {...interaction.getReferenceProps()}
+      ref={setAnchor}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
     >
       {children}
     </Comp>
@@ -159,52 +125,127 @@ const TooltipTrigger = ({
 };
 
 /************************************ PORTAL *************************************/
-export interface TooltipPortalProps extends FloatingPortalProps {
+export interface TooltipPortalProps {
   container?: HTMLElement;
+  children: React.ReactNode;
 }
 
 const TooltipPortal = ({
-  children,
   container = document.body,
-  ...restProps
+  children,
 }: TooltipPortalProps) => {
-  const { isOpen } = useTooltipPrimitiveContext();
+  const { open } = useTooltipPrimitiveContext();
 
-  return isOpen ? (
-    <FloatingPortal root={container} {...restProps}>
-      {children}
-    </FloatingPortal>
-  ) : null;
+  return open ? <Portal container={container}>{children}</Portal> : null;
 };
+
+/************************************ CONTENT CONTEXT*************************************/
+
+type Placement = "top" | "right" | "bottom" | "left";
+interface TooltipContentContextValue {
+  arrow: HTMLElement | null;
+  setArrow: (arrow: HTMLElement | null) => void;
+  arrowX?: number;
+  arrowY?: number;
+  placement: Placement;
+}
+
+const [TooltipPrimitiveContentProvider, useTooltipPrimitiveContentContext] =
+  createContext<TooltipContentContextValue>();
 
 /************************************ CONTENT *************************************/
 export interface TooltipContentProps
-  extends React.ComponentPropsWithRef<"div"> {}
+  extends React.ComponentPropsWithRef<"div"> {
+  asChild?: boolean;
+  placement?: Placement;
+  offset?: number;
+}
 
 const TooltipContent = ({
   children,
   style,
+  offset: offsetProp = 10,
+  ref: refProp,
+  asChild = false,
+  placement = "top",
   ...restProps
 }: TooltipContentProps) => {
-  const { contentStyles, floatingElement, interaction } =
+  const Comp = asChild ? Slot : "div";
+  const { anchor, open, status, setStatus, closeTooltip } =
     useTooltipPrimitiveContext();
 
-  const { refs, floatingStyles } = floatingElement;
+  const [arrowELement, setArrowElement] = React.useState<HTMLElement | null>(
+    null,
+  );
+
+  const { floatingStyles, refs, middlewareData } = useFloating({
+    placement,
+    elements: {
+      reference: anchor,
+    },
+    transform: false,
+    open,
+    whileElementsMounted: autoUpdate,
+    middleware: [
+      shift({ padding: 5 }),
+      offset(offsetProp),
+      flip({ padding: 5 }),
+      arrow({
+        element: arrowELement,
+      }),
+    ],
+  });
+
+  const arrowX = middlewareData.arrow?.x;
+  const arrowY = middlewareData.arrow?.y;
+
+  const contentElement = refs.floating.current;
+
+  React.useLayoutEffect(() => {
+    if (!contentElement) return;
+    if (status !== "exiting") return;
+
+    if (hasTransition(contentElement)) {
+      const handleTransitionEnd = () => {
+        if (status === "exiting") {
+          setStatus("unmounted");
+          closeTooltip();
+        }
+      };
+
+      contentElement.addEventListener("transitionend", handleTransitionEnd, {
+        once: true,
+      });
+    } else {
+      setStatus("unmounted");
+      closeTooltip();
+    }
+  }, [closeTooltip, contentElement, setStatus, status]);
 
   return (
-    <div
-      role="tooltip"
-      ref={refs.setFloating}
-      style={floatingStyles}
-      {...interaction.getFloatingProps()}
+    <TooltipPrimitiveContentProvider
+      value={{
+        arrow: arrowELement,
+        setArrow: setArrowElement,
+        arrowX,
+        arrowY,
+        placement,
+      }}
     >
-      <div {...restProps} style={{ ...contentStyles, ...style }}>
+      <Comp
+        role="tooltip"
+        ref={mergeRefs([refProp, refs.setFloating])}
+        style={{ ...floatingStyles, ...style }}
+        data-status={status}
+        {...restProps}
+      >
         {children}
-      </div>
-    </div>
+      </Comp>
+    </TooltipPrimitiveContentProvider>
   );
 };
 
+/************************************ ARROW *************************************/
 export interface TooltipArrowProps extends React.ComponentPropsWithRef<"div"> {
   asChild?: boolean;
 }
@@ -216,45 +257,41 @@ const TooltipArrow = ({
   ...restProps
 }: TooltipArrowProps) => {
   const Comp = asChild ? Slot : "div";
-  const { arrowRef, floatingElement } = useTooltipPrimitiveContext();
-  const { middlewareData, placement } = floatingElement;
+  const { arrowX, arrowY, setArrow, placement } =
+    useTooltipPrimitiveContentContext();
 
-  const arrowX = middlewareData.arrow?.x ?? 0;
-  const arrowY = middlewareData.arrow?.y ?? 0;
+  const TRANSFORM: Record<Placement, string> = {
+    top: "translateY(100%)",
+    right: "translateY(50%) rotate(90deg) translateX(-50%)",
+    bottom: `rotate(180deg)`,
+    left: "translateY(50%) rotate(-90deg) translateX(50%)",
+  };
 
-  const rotate = placement.startsWith("top")
-    ? "0"
-    : placement.startsWith("bottom")
-      ? "-180deg"
-      : placement.startsWith("left")
-        ? "-90deg"
-        : "90deg";
+  const OPPOSITE_PLACEMENT: Record<Placement, Placement> = {
+    top: "bottom",
+    right: "left",
+    bottom: "top",
+    left: "right",
+  };
+
+  const TRANSFORM_ORIGIN: Record<Placement, string> = {
+    top: "",
+    right: "0 0",
+    bottom: "center 0",
+    left: "100% 0",
+  };
 
   return (
     <Comp
-      ref={arrowRef}
+      ref={setArrow}
       {...restProps}
       style={{
         position: "absolute",
-        height: `${DEFAULT_ARROW_HEIGHT}px`,
-        width: `${DEFAULT_ARROW_WIDTH}px`,
-        transform: `rotate(${rotate})`,
-        ...(placement.startsWith("top") && {
-          left: arrowX,
-          bottom: -DEFAULT_ARROW_HEIGHT,
-        }),
-        ...(placement.startsWith("bottom") && {
-          left: arrowX,
-          top: -DEFAULT_ARROW_HEIGHT,
-        }),
-        ...(placement.startsWith("left") && {
-          top: arrowY,
-          right: -DEFAULT_ARROW_HEIGHT,
-        }),
-        ...(placement.startsWith("right") && {
-          top: arrowY,
-          left: -DEFAULT_ARROW_HEIGHT,
-        }),
+        left: arrowX,
+        top: arrowY,
+        transform: TRANSFORM[placement],
+        transformOrigin: TRANSFORM_ORIGIN[placement],
+        [OPPOSITE_PLACEMENT[placement]]: 0,
         ...style,
       }}
     >
@@ -262,6 +299,20 @@ const TooltipArrow = ({
     </Comp>
   );
 };
+
+function hasTransition(element: HTMLElement) {
+  const style = window.getComputedStyle(element);
+
+  const hasValidProperty = style.transitionProperty
+    .split(",")
+    .some((p) => p !== "none");
+
+  return (
+    hasValidProperty &&
+    style.transitionDuration &&
+    style.transitionDuration !== "0s"
+  );
+}
 
 export {
   TooltipArrow,

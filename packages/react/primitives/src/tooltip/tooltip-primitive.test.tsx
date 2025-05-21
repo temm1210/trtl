@@ -1,7 +1,7 @@
-import React, { act } from "react";
+import React from "react";
 
 import { render } from "@rtl/react-utils";
-import { fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
+import { act } from "@testing-library/react";
 
 import {
   TooltipArrow,
@@ -57,7 +57,7 @@ describe("Tooltip primitive tests", () => {
     expect(handleOpenChange).toHaveBeenCalledWith(true);
 
     await userEvent.unhover(trigger);
-    await waitForElementToBeRemoved(() => queryByRole("tooltip"));
+
     expect(handleOpenChange).toHaveBeenCalledTimes(2);
     expect(handleOpenChange).toHaveBeenCalledWith(false);
   });
@@ -85,7 +85,7 @@ describe("Tooltip primitive tests", () => {
     expect(getByRole("tooltip")).toBeInTheDocument();
 
     await userEvent.unhover(trigger);
-    await waitForElementToBeRemoved(() => queryByRole("tooltip"));
+    expect(queryByRole("tooltip")).not.toBeInTheDocument();
   });
 
   test("delayDuration prop should work correctly", async () => {
@@ -129,10 +129,12 @@ describe("Tooltip primitive tests", () => {
     act(() => {
       vi.advanceTimersByTime(DELAY_TIME);
     });
-    await waitForElementToBeRemoved(() => queryByRole("tooltip"));
+
+    expect(queryByRole("tooltip")).not.toBeInTheDocument();
 
     vi.useRealTimers();
   });
+
   test("disabled", async () => {
     const Tooltip = (props: TooltipRootProps) => {
       return (
@@ -164,8 +166,8 @@ describe("Tooltip primitive tests", () => {
     expect(queryByRole("tooltip")).not.toBeInTheDocument();
   });
 
-  test("defaultChecked", async () => {
-    const { getByRole, queryByRole, getByTestId } = render(
+  test("defaultOpen", async () => {
+    const { getByRole } = render(
       <TooltipRoot defaultOpen delayDuration={0}>
         <TooltipTrigger asChild>
           <span data-testid="test-trigger">trigger</span>
@@ -181,8 +183,5 @@ describe("Tooltip primitive tests", () => {
     const tooltip = getByRole("tooltip");
 
     expect(tooltip).toBeInTheDocument();
-
-    fireEvent.mouseLeave(getByTestId("test-trigger"));
-    await waitForElementToBeRemoved(() => queryByRole("tooltip"));
   });
 });

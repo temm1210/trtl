@@ -10,6 +10,19 @@
   padding: 0.875rem;
   font-size: 0.875rem;
   border-radius: 0.25rem;
+
+  transition:
+    opacity 200ms ease-in-out,
+    transform 200ms ease-in-out;
+
+  opacity: 1;
+  transform: scale(1);
+
+  &[data-status="entering"],
+  &[data-status="exiting"] {
+    opacity: 0;
+    transform: scale(0.7);
+  }
 }
 
 .tooltip-trigger {
