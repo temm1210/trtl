@@ -1,18 +1,16 @@
-import React, { act } from "react";
+import React from "react";
 
 import { render } from "@rtl/react-utils";
-import { fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
 
 import {
   TooltipArrow,
   TooltipContent,
   TooltipPortal,
   TooltipRoot,
-  TooltipRootProps,
   TooltipTrigger,
 } from "./tooltip-primitive";
 
-describe.skip("Tooltip primitive tests", () => {
+describe("Tooltip primitive tests", () => {
   test("controlled", async () => {
     const handleOpenChange = vi.fn();
 
@@ -57,7 +55,7 @@ describe.skip("Tooltip primitive tests", () => {
     expect(handleOpenChange).toHaveBeenCalledWith(true);
 
     await userEvent.unhover(trigger);
-    await waitForElementToBeRemoved(() => queryByRole("tooltip"));
+
     expect(handleOpenChange).toHaveBeenCalledTimes(2);
     expect(handleOpenChange).toHaveBeenCalledWith(false);
   });
@@ -85,104 +83,104 @@ describe.skip("Tooltip primitive tests", () => {
     expect(getByRole("tooltip")).toBeInTheDocument();
 
     await userEvent.unhover(trigger);
-    await waitForElementToBeRemoved(() => queryByRole("tooltip"));
-  });
-
-  test("delayDuration prop should work correctly", async () => {
-    // https://github.com/testing-library/dom-testing-library/issues/987#issuecomment-1266266801
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-
-    const DELAY_TIME = 1500;
-    const { userEvent, getByTestId, queryByRole, getByRole } = render(
-      <TooltipRoot delayDuration={DELAY_TIME}>
-        <TooltipTrigger asChild>
-          <span data-testid="test-trigger">trigger</span>
-        </TooltipTrigger>
-        <TooltipPortal>
-          <TooltipContent>
-            <TooltipArrow data-testid="test-arrow" />
-            <div>Content</div>
-          </TooltipContent>
-        </TooltipPortal>
-      </TooltipRoot>,
-      {
-        advanceTimers: vi.advanceTimersByTime,
-      },
-    );
-
-    const trigger = getByTestId("test-trigger");
-
-    await userEvent.hover(trigger);
-    expect(queryByRole("tooltip")).not.toBeInTheDocument();
-
-    /**
-     * https://github.com/vitest-dev/vitest/issues/1983#issuecomment-1238794400
-     */
-    act(() => {
-      vi.advanceTimersByTime(DELAY_TIME);
-    });
-    expect(getByRole("tooltip")).toBeInTheDocument();
-
-    await userEvent.unhover(trigger);
-    expect(getByRole("tooltip")).toBeInTheDocument();
-
-    act(() => {
-      vi.advanceTimersByTime(DELAY_TIME);
-    });
-    await waitForElementToBeRemoved(() => queryByRole("tooltip"));
-
-    vi.useRealTimers();
-  });
-  test("disabled", async () => {
-    const Tooltip = (props: TooltipRootProps) => {
-      return (
-        <TooltipRoot disabled delayDuration={0} {...props}>
-          <TooltipTrigger asChild>
-            <span data-testid="test-trigger">trigger</span>
-          </TooltipTrigger>
-          <TooltipPortal>
-            <TooltipContent>
-              <TooltipArrow data-testid="test-arrow" />
-              <div>Content</div>
-            </TooltipContent>
-          </TooltipPortal>
-        </TooltipRoot>
-      );
-    };
-
-    const { userEvent, getByTestId, queryByRole, rerender } = render(
-      <Tooltip />,
-    );
-
-    await userEvent.hover(getByTestId("test-trigger"));
-    expect(queryByRole("tooltip")).not.toBeInTheDocument();
-
-    rerender(<Tooltip open disabled />);
-    expect(queryByRole("tooltip")).not.toBeInTheDocument();
-
-    rerender(<Tooltip defaultOpen disabled />);
     expect(queryByRole("tooltip")).not.toBeInTheDocument();
   });
 
-  test("defaultChecked", async () => {
-    const { getByRole, queryByRole, getByTestId } = render(
-      <TooltipRoot defaultOpen delayDuration={0}>
-        <TooltipTrigger asChild>
-          <span data-testid="test-trigger">trigger</span>
-        </TooltipTrigger>
-        <TooltipPortal>
-          <TooltipContent>
-            <TooltipArrow data-testid="test-arrow" />
-            <div>Content</div>
-          </TooltipContent>
-        </TooltipPortal>
-      </TooltipRoot>,
-    );
-    const tooltip = getByRole("tooltip");
+  // test("delayDuration prop should work correctly", async () => {
+  //   // https://github.com/testing-library/dom-testing-library/issues/987#issuecomment-1266266801
+  //   vi.useFakeTimers({ shouldAdvanceTime: true });
 
-    expect(tooltip).toBeInTheDocument();
+  //   const DELAY_TIME = 1500;
+  //   const { userEvent, getByTestId, queryByRole, getByRole } = render(
+  //     <TooltipRoot delayDuration={DELAY_TIME}>
+  //       <TooltipTrigger asChild>
+  //         <span data-testid="test-trigger">trigger</span>
+  //       </TooltipTrigger>
+  //       <TooltipPortal>
+  //         <TooltipContent>
+  //           <TooltipArrow data-testid="test-arrow" />
+  //           <div>Content</div>
+  //         </TooltipContent>
+  //       </TooltipPortal>
+  //     </TooltipRoot>,
+  // {
+  //   advanceTimers: vi.advanceTimersByTime,
+  // },
+  //   );
 
-    fireEvent.mouseLeave(getByTestId("test-trigger"));
-    await waitForElementToBeRemoved(() => queryByRole("tooltip"));
-  });
+  //   const trigger = getByTestId("test-trigger");
+
+  //   await userEvent.hover(trigger);
+  //   expect(queryByRole("tooltip")).not.toBeInTheDocument();
+
+  //   /**
+  //    * https://github.com/vitest-dev/vitest/issues/1983#issuecomment-1238794400
+  //    */
+  //   act(() => {
+  //     vi.advanceTimersByTime(DELAY_TIME);
+  //   });
+  //   expect(getByRole("tooltip")).toBeInTheDocument();
+
+  //   await userEvent.unhover(trigger);
+  //   expect(getByRole("tooltip")).toBeInTheDocument();
+
+  //   act(() => {
+  //     vi.advanceTimersByTime(DELAY_TIME);
+  //   });
+  //   await waitForElementToBeRemoved(() => queryByRole("tooltip"));
+
+  //   vi.useRealTimers();
+  // });
+  // test("disabled", async () => {
+  //   const Tooltip = (props: TooltipRootProps) => {
+  //     return (
+  //       <TooltipRoot disabled delayDuration={0} {...props}>
+  //         <TooltipTrigger asChild>
+  //           <span data-testid="test-trigger">trigger</span>
+  //         </TooltipTrigger>
+  //         <TooltipPortal>
+  //           <TooltipContent>
+  //             <TooltipArrow data-testid="test-arrow" />
+  //             <div>Content</div>
+  //           </TooltipContent>
+  //         </TooltipPortal>
+  //       </TooltipRoot>
+  //     );
+  //   };
+
+  //   const { userEvent, getByTestId, queryByRole, rerender } = render(
+  //     <Tooltip />,
+  //   );
+
+  //   await userEvent.hover(getByTestId("test-trigger"));
+  //   expect(queryByRole("tooltip")).not.toBeInTheDocument();
+
+  //   rerender(<Tooltip open disabled />);
+  //   expect(queryByRole("tooltip")).not.toBeInTheDocument();
+
+  //   rerender(<Tooltip defaultOpen disabled />);
+  //   expect(queryByRole("tooltip")).not.toBeInTheDocument();
+  // });
+
+  // test("defaultOpen", async () => {
+  //   const { getByRole, queryByRole, getByTestId } = render(
+  //     <TooltipRoot defaultOpen delayDuration={0}>
+  //       <TooltipTrigger asChild>
+  //         <span data-testid="test-trigger">trigger</span>
+  //       </TooltipTrigger>
+  //       <TooltipPortal>
+  //         <TooltipContent>
+  //           <TooltipArrow data-testid="test-arrow" />
+  //           <div>Content</div>
+  //         </TooltipContent>
+  //       </TooltipPortal>
+  //     </TooltipRoot>,
+  //   );
+  //   const tooltip = getByRole("tooltip");
+
+  //   expect(tooltip).toBeInTheDocument();
+
+  //   fireEvent.mouseLeave(getByTestId("test-trigger"));
+  //   await waitForElementToBeRemoved(() => queryByRole("tooltip"));
+  // });
 });

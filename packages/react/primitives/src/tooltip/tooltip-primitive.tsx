@@ -27,11 +27,10 @@ const [TooltipPrimitiveProvider, useTooltipPrimitiveContext] =
 
 export interface TooltipRootProps {
   open?: boolean;
-  offset?: number;
   defaultOpen?: boolean;
   disabled?: boolean;
-  onOpenChange?: (open: boolean) => void;
   delayDuration?: number;
+  onOpenChange?: (open: boolean) => void;
   children?: React.ReactNode;
 }
 
@@ -40,6 +39,8 @@ const TooltipRoot = ({
   children,
   open: openProp,
   onOpenChange: onOpenChangeProp,
+  // disabled,
+  // delayDuration,
   defaultOpen,
 }: TooltipRootProps) => {
   const [isOpen, setIsOpen] = React.useState(defaultOpen ?? false);
@@ -84,8 +85,7 @@ export interface TooltipTriggerProps
 
 const TooltipTrigger = ({ children, asChild }: TooltipTriggerProps) => {
   const Comp = asChild ? Slot : "button";
-  const { openTooltip, setStatus, closeTooltip, setAnchor } =
-    useTooltipPrimitiveContext();
+  const { openTooltip, setStatus, setAnchor } = useTooltipPrimitiveContext();
 
   const handlePointerEnter = () => {
     openTooltip();
@@ -96,18 +96,15 @@ const TooltipTrigger = ({ children, asChild }: TooltipTriggerProps) => {
     });
   };
 
-  const handleTransitionEnd = () => {
-    if (status === "exiting") {
-      setStatus("unmounted");
-      closeTooltip();
-    }
+  const handlePointerLeave = () => {
+    setStatus("exiting");
   };
 
   return (
     <Comp
       ref={setAnchor}
       onPointerEnter={handlePointerEnter}
-      onTransitionEnd={handleTransitionEnd}
+      onPointerLeave={handlePointerLeave}
     >
       {children}
     </Comp>
@@ -148,18 +145,21 @@ export interface TooltipContentProps
   extends React.ComponentPropsWithRef<"div"> {
   asChild?: boolean;
   placement?: Placement;
+  offset?: number;
 }
 
 const TooltipContent = ({
   children,
   style,
+  offset: offsetProp = 10,
   ref: refProp,
   asChild = false,
   placement = "top",
   ...restProps
 }: TooltipContentProps) => {
   const Comp = asChild ? Slot : "div";
-  const { anchor, open, status, setStatus } = useTooltipPrimitiveContext();
+  const { anchor, open, status, setStatus, closeTooltip } =
+    useTooltipPrimitiveContext();
 
   const [arrowELement, setArrowElement] = React.useState<HTMLElement | null>(
     null,
@@ -175,7 +175,7 @@ const TooltipContent = ({
     whileElementsMounted: autoUpdate,
     middleware: [
       shift({ padding: 5 }),
-      offset(10),
+      offset(offsetProp),
       flip({ padding: 5 }),
       arrow({
         element: arrowELement,
@@ -186,56 +186,28 @@ const TooltipContent = ({
   const arrowX = middlewareData.arrow?.x;
   const arrowY = middlewareData.arrow?.y;
 
-  const content = refs.floating.current;
+  const contentElement = refs.floating.current;
 
-  React.useEffect(() => {
-    if (status !== "mounted") return;
+  React.useLayoutEffect(() => {
+    if (!contentElement) return;
+    if (status !== "exiting") return;
 
-    const handlePointerMove = (ev: PointerEvent) => {
-      if (!anchor || !content) {
-        setStatus("exiting");
-        return;
-      }
+    if (hasTransition(contentElement)) {
+      const handleTransitionEnd = () => {
+        if (status === "exiting") {
+          setStatus("unmounted");
+          closeTooltip();
+        }
+      };
 
-      const anchorRect = anchor.getBoundingClientRect();
-      const contentRect = content.getBoundingClientRect();
-
-      const gapRect = getGapFromRectByPlacement(
-        anchorRect,
-        contentRect,
-        placement,
-      );
-
-      if (!gapRect) {
-        setStatus("exiting");
-        return;
-      }
-
-      const pointerX = ev.clientX;
-      const pointerY = ev.clientY;
-
-      const isPointerRangeGap =
-        pointerX >= gapRect.minX &&
-        pointerX <= gapRect.maxX &&
-        pointerY >= gapRect.minY &&
-        pointerY <= gapRect.maxY;
-
-      const isPointerInRangeElement = [content, anchor].some((element) =>
-        element.contains(document.elementFromPoint(pointerX, pointerY)),
-      );
-
-      if (!isPointerInRangeElement && !isPointerRangeGap) {
-        setStatus("exiting");
-      }
-    };
-
-    document.addEventListener("pointermove", handlePointerMove, {
-      passive: true,
-    });
-    return () => {
-      document.removeEventListener("pointermove", handlePointerMove);
-    };
-  }, [anchor, content, placement, setStatus, status]);
+      contentElement.addEventListener("transitionend", handleTransitionEnd, {
+        once: true,
+      });
+    } else {
+      setStatus("unmounted");
+      closeTooltip();
+    }
+  }, [closeTooltip, contentElement, setStatus, status]);
 
   return (
     <TooltipPrimitiveContentProvider
@@ -315,43 +287,18 @@ const TooltipArrow = ({
   );
 };
 
-function getGapFromRectByPlacement(
-  anchor: DOMRect,
-  content: DOMRect,
-  placement: Placement,
-) {
-  switch (placement) {
-    case "bottom":
-      return {
-        minX: content.left,
-        maxX: content.right,
-        minY: anchor.bottom,
-        maxY: content.top,
-      };
-    case "top":
-      return {
-        minX: content.left,
-        maxX: content.right,
-        minY: content.bottom,
-        maxY: anchor.top,
-      };
-    case "right":
-      return {
-        minX: anchor.right,
-        maxX: content.left,
-        minY: content.top,
-        maxY: content.bottom,
-      };
-    case "left":
-      return {
-        minX: content.right,
-        maxX: anchor.left,
-        minY: content.top,
-        maxY: content.bottom,
-      };
-    default:
-      return null;
-  }
+function hasTransition(element: HTMLElement) {
+  const style = window.getComputedStyle(element);
+
+  const hasValidProperty = style.transitionProperty
+    .split(",")
+    .some((p) => p !== "none");
+
+  return (
+    hasValidProperty &&
+    style.transitionDuration &&
+    style.transitionDuration !== "0s"
+  );
 }
 
 export {
