@@ -214,9 +214,9 @@ const TooltipContent = ({
     };
 
     if (hasTransition(contentElement)) {
-      contentElement.addEventListener("transitionend", handleCloseTooltip);
-      return () =>
-        contentElement.removeEventListener("transitionend", handleCloseTooltip);
+      contentElement.addEventListener("transitionend", handleCloseTooltip, {
+        once: true,
+      });
     } else {
       handleCloseTooltip();
     }
