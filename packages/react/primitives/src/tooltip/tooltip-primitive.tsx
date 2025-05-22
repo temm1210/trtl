@@ -207,10 +207,8 @@ const TooltipContent = ({
 
     if (hasTransition(contentElement)) {
       const handleTransitionEnd = () => {
-        if (status === "exiting") {
-          setStatus("unmounted");
-          closeTooltip();
-        }
+        setStatus("unmounted");
+        closeTooltip();
       };
 
       contentElement.addEventListener("transitionend", handleTransitionEnd, {
