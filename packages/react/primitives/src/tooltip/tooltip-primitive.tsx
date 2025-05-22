@@ -126,17 +126,21 @@ const TooltipTrigger = ({ children, asChild }: TooltipTriggerProps) => {
 
 /************************************ PORTAL *************************************/
 export interface TooltipPortalProps {
+  forceMount?: boolean;
   container?: HTMLElement;
   children: React.ReactNode;
 }
 
 const TooltipPortal = ({
   container = document.body,
+  forceMount,
   children,
 }: TooltipPortalProps) => {
-  const { open } = useTooltipPrimitiveContext();
+  const { open = true } = useTooltipPrimitiveContext();
 
-  return open ? <Portal container={container}>{children}</Portal> : null;
+  return forceMount || open ? (
+    <Portal container={container}>{children}</Portal>
+  ) : null;
 };
 
 /************************************ CONTENT CONTEXT*************************************/
@@ -202,21 +206,19 @@ const TooltipContent = ({
   const contentElement = refs.floating.current;
 
   React.useLayoutEffect(() => {
-    if (!contentElement) return;
-    if (status !== "exiting") return;
+    if (!contentElement || status !== "exiting") return;
 
-    if (hasTransition(contentElement)) {
-      const handleTransitionEnd = () => {
-        setStatus("unmounted");
-        closeTooltip();
-      };
-
-      contentElement.addEventListener("transitionend", handleTransitionEnd, {
-        once: true,
-      });
-    } else {
+    const handleCloseTooltip = () => {
       setStatus("unmounted");
       closeTooltip();
+    };
+
+    if (hasTransition(contentElement)) {
+      contentElement.addEventListener("transitionend", handleCloseTooltip);
+      return () =>
+        contentElement.removeEventListener("transitionend", handleCloseTooltip);
+    } else {
+      handleCloseTooltip();
     }
   }, [closeTooltip, contentElement, setStatus, status]);
 

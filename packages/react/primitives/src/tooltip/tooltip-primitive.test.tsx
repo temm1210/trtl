@@ -33,7 +33,7 @@ describe("Tooltip primitive tests", () => {
           </TooltipTrigger>
           <TooltipPortal>
             <TooltipContent>
-              <TooltipArrow data-testid="test-arrow" />
+              <TooltipArrow />
               <div>Content</div>
             </TooltipContent>
           </TooltipPortal>
@@ -69,10 +69,7 @@ describe("Tooltip primitive tests", () => {
           <span data-testid="test-trigger">trigger</span>
         </TooltipTrigger>
         <TooltipPortal>
-          <TooltipContent>
-            <TooltipArrow data-testid="test-arrow" />
-            <div>Content</div>
-          </TooltipContent>
+          <TooltipContent>Content</TooltipContent>
         </TooltipPortal>
       </TooltipRoot>,
     );
@@ -92,17 +89,14 @@ describe("Tooltip primitive tests", () => {
     // https://github.com/testing-library/dom-testing-library/issues/987#issuecomment-1266266801
     vi.useFakeTimers({ shouldAdvanceTime: true });
 
-    const DELAY_TIME = 1500;
+    const DELAY_TIME = 2500;
     const { userEvent, getByTestId, queryByRole, getByRole } = render(
       <TooltipRoot delayDuration={DELAY_TIME}>
         <TooltipTrigger asChild>
           <span data-testid="test-trigger">trigger</span>
         </TooltipTrigger>
         <TooltipPortal>
-          <TooltipContent>
-            <TooltipArrow data-testid="test-arrow" />
-            <div>Content</div>
-          </TooltipContent>
+          <TooltipContent>Content</TooltipContent>
         </TooltipPortal>
       </TooltipRoot>,
       {
@@ -129,7 +123,6 @@ describe("Tooltip primitive tests", () => {
     act(() => {
       vi.advanceTimersByTime(DELAY_TIME);
     });
-
     expect(queryByRole("tooltip")).not.toBeInTheDocument();
 
     vi.useRealTimers();
@@ -144,7 +137,7 @@ describe("Tooltip primitive tests", () => {
           </TooltipTrigger>
           <TooltipPortal>
             <TooltipContent>
-              <TooltipArrow data-testid="test-arrow" />
+              <TooltipArrow />
               <div>Content</div>
             </TooltipContent>
           </TooltipPortal>
@@ -169,12 +162,27 @@ describe("Tooltip primitive tests", () => {
   test("defaultOpen", async () => {
     const { getByRole } = render(
       <TooltipRoot defaultOpen delayDuration={0}>
-        <TooltipTrigger asChild>
-          <span data-testid="test-trigger">trigger</span>
-        </TooltipTrigger>
+        <TooltipTrigger>trigger</TooltipTrigger>
         <TooltipPortal>
           <TooltipContent>
-            <TooltipArrow data-testid="test-arrow" />
+            <TooltipArrow />
+            <div>Content</div>
+          </TooltipContent>
+        </TooltipPortal>
+      </TooltipRoot>,
+    );
+    const tooltip = getByRole("tooltip");
+
+    expect(tooltip).toBeInTheDocument();
+  });
+
+  test("portal forceMount", async () => {
+    const { getByRole } = render(
+      <TooltipRoot delayDuration={0}>
+        <TooltipTrigger>trigger</TooltipTrigger>
+        <TooltipPortal forceMount>
+          <TooltipContent>
+            <TooltipArrow />
             <div>Content</div>
           </TooltipContent>
         </TooltipPortal>
