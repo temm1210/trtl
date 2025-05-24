@@ -14,14 +14,12 @@ type Status = "mounted" | "unmounted" | "entering" | "exiting";
 
 interface TooltipContextValue {
   status: Status;
-  setStatus: (status: Status) => void;
   anchor: HTMLElement | null;
   setAnchor: (anchor: HTMLElement | null) => void;
   open: boolean;
-  disabled: boolean;
-  delayDuration: number;
   openTooltip: () => void;
   closeTooltip: () => void;
+  startExitingTooltip: () => void;
 }
 
 const [TooltipPrimitiveProvider, useTooltipPrimitiveContext] =
@@ -48,19 +46,48 @@ const TooltipRoot = ({
   const [isOpen, setIsOpen] = React.useState(defaultOpen ?? false);
   const [status, setStatus] = React.useState<Status>("unmounted");
   const [anchor, setAnchor] = React.useState<HTMLElement | null>(null);
+  const timerRef = React.useRef(0);
 
   const isControlled = openProp !== undefined;
   const open = disabled ? false : isControlled ? openProp : isOpen;
 
   const handleOpenTooltip = React.useCallback(() => {
-    setIsOpen(true);
-    onOpenChangeProp?.(true);
-  }, [onOpenChangeProp]);
+    window.clearTimeout(timerRef.current);
 
-  const handleCloseChange = React.useCallback(() => {
+    timerRef.current = window.setTimeout(() => {
+      setIsOpen(true);
+      setStatus("entering");
+      onOpenChangeProp?.(true);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setStatus("mounted"));
+      });
+    }, delayDuration);
+  }, [delayDuration, onOpenChangeProp]);
+
+  const handleCloseTooltip = React.useCallback(() => {
     setIsOpen(false);
+    setStatus("unmounted");
     onOpenChangeProp?.(false);
   }, [onOpenChangeProp]);
+
+  const handleDelayedExiting = React.useCallback(() => {
+    window.clearTimeout(timerRef.current);
+
+    timerRef.current = window.setTimeout(
+      () => setStatus("exiting"),
+      delayDuration,
+    );
+  }, [delayDuration]);
+
+  React.useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        window.clearTimeout(timerRef.current);
+        timerRef.current = 0;
+      }
+    };
+  }, []);
 
   return (
     <TooltipPrimitiveProvider
@@ -68,11 +95,9 @@ const TooltipRoot = ({
         anchor,
         setAnchor,
         status,
-        setStatus,
-        delayDuration,
-        disabled,
         openTooltip: handleOpenTooltip,
-        closeTooltip: handleCloseChange,
+        closeTooltip: handleCloseTooltip,
+        startExitingTooltip: handleDelayedExiting,
         open,
       }}
     >
@@ -89,25 +114,11 @@ export interface TooltipTriggerProps
 
 const TooltipTrigger = ({ children, asChild }: TooltipTriggerProps) => {
   const Comp = asChild ? Slot : "button";
-  const timerRef = React.useRef(0);
 
-  const { openTooltip, setStatus, setAnchor, delayDuration } =
-    useTooltipPrimitiveContext();
-
-  const handlePointerEnter = () => {
-    window.clearTimeout(timerRef.current);
-    timerRef.current = window.setTimeout(() => {
-      openTooltip();
-      setStatus("entering");
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => setStatus("mounted"));
-      });
-    }, delayDuration);
-  };
+  const { setAnchor, openTooltip } = useTooltipPrimitiveContext();
 
   return (
-    <Comp ref={setAnchor} onPointerEnter={handlePointerEnter}>
+    <Comp ref={setAnchor} onPointerEnter={openTooltip}>
       {children}
     </Comp>
   );
@@ -172,7 +183,7 @@ const TooltipContent = ({
 }: TooltipContentProps) => {
   const Comp = asChild ? Slot : "div";
 
-  const { anchor, open, status, setStatus, closeTooltip, delayDuration } =
+  const { anchor, open, status, startExitingTooltip, closeTooltip } =
     useTooltipPrimitiveContext();
   const [safeRectangle, setSafeRectangle] =
     React.useState<SafeRectangleArea | null>(null);
@@ -206,37 +217,34 @@ const TooltipContent = ({
   React.useEffect(() => {
     if (!contentElement || status !== "exiting") return;
 
-    const handleCloseTooltip = () => {
-      setStatus("unmounted");
-      closeTooltip();
-    };
-
     const animations = contentElement.getAnimations();
 
     if (animations.length > 0) {
       Promise.allSettled(animations.map((anim) => anim.finished)).then(() => {
-        handleCloseTooltip();
+        closeTooltip();
       });
     } else {
-      handleCloseTooltip();
+      closeTooltip();
     }
-  }, [closeTooltip, contentElement, setStatus, status]);
+  }, [closeTooltip, contentElement, status]);
 
   React.useEffect(() => {
-    const handlePointerMove = (ev: PointerEvent) => {
-      if (!safeRectangle) return;
-      if (isInSide({ x: ev.clientX, y: ev.clientY }, safeRectangle)) return;
+    if (!safeRectangle) return;
 
-      setTimeout(() => setStatus("exiting"), delayDuration);
+    const handlePointerMove = (ev: PointerEvent) => {
+      if (isInSide({ x: ev.clientX, y: ev.clientY }, safeRectangle)) {
+        return;
+      }
+      startExitingTooltip();
     };
+
     document.addEventListener("pointermove", handlePointerMove, {
       passive: true,
     });
     return () => document.removeEventListener("pointermove", handlePointerMove);
-  }, [delayDuration, safeRectangle, setStatus]);
+  }, [startExitingTooltip, safeRectangle]);
 
   React.useEffect(() => {
-    if (status !== "mounted") return;
     if (!anchor || !contentElement) return;
 
     const handlePointerLeave = () => {
@@ -257,7 +265,7 @@ const TooltipContent = ({
       anchor.removeEventListener("pointerleave", handlePointerLeave);
       contentElement.removeEventListener("pointerleave", handlePointerLeave);
     };
-  }, [anchor, contentElement, placement, status]);
+  }, [anchor, contentElement, placement]);
 
   return (
     <TooltipPrimitiveContentProvider
@@ -274,10 +282,8 @@ const TooltipContent = ({
         ref={mergeRefs([refProp, refs.setFloating])}
         style={{ ...floatingStyles, ...style }}
         data-status={status}
-        data-open={open && status !== "exiting" ? "" : undefined}
-        data-closed={
-          status === "unmounted" || status === "exiting" ? "" : undefined
-        }
+        data-open={open ? "" : undefined}
+        data-closed={status === "exiting" ? "" : undefined}
         {...restProps}
       >
         {children}
