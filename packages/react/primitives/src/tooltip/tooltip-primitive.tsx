@@ -154,6 +154,13 @@ export interface TooltipContentProps
   offset?: number;
 }
 
+interface SafeRectangleArea {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
+
 const TooltipContent = ({
   children,
   style,
@@ -164,9 +171,11 @@ const TooltipContent = ({
   ...restProps
 }: TooltipContentProps) => {
   const Comp = asChild ? Slot : "div";
+
   const { anchor, open, status, setStatus, closeTooltip, delayDuration } =
     useTooltipPrimitiveContext();
-
+  const [safeRectangle, setSafeRectangle] =
+    React.useState<SafeRectangleArea | null>(null);
   const [arrowELement, setArrowElement] = React.useState<HTMLElement | null>(
     null,
   );
@@ -213,52 +222,42 @@ const TooltipContent = ({
     }
   }, [closeTooltip, contentElement, setStatus, status]);
 
-  React.useLayoutEffect(() => {
-    if (status !== "mounted" || !anchor || !contentElement) return;
+  React.useEffect(() => {
+    const handlePointerMove = (ev: PointerEvent) => {
+      if (!safeRectangle) return;
+      if (isInSide({ x: ev.clientX, y: ev.clientY }, safeRectangle)) return;
 
-    let cleanup: (() => void) | undefined;
+      setTimeout(() => setStatus("exiting"), delayDuration);
+    };
+    document.addEventListener("pointermove", handlePointerMove, {
+      passive: true,
+    });
+    return () => document.removeEventListener("pointermove", handlePointerMove);
+  }, [delayDuration, safeRectangle, setStatus]);
+
+  React.useEffect(() => {
+    if (status !== "mounted") return;
+    if (!anchor || !contentElement) return;
 
     const handlePointerLeave = () => {
       const refRect = anchor.getBoundingClientRect();
       const floRect = contentElement.getBoundingClientRect();
-      const safeRectangle = getGapFromRectByPlacement(
+      const safeRectangle = getSafeRectangleByPlacement(
         refRect,
         floRect,
         placement,
       );
 
-      const handlePointerMove = (ev: PointerEvent) => {
-        if (!safeRectangle) return;
-
-        if (isInSide({ x: ev.clientX, y: ev.clientY }, safeRectangle)) {
-          return;
-        }
-
-        setTimeout(() => {
-          setStatus("exiting");
-          cleanup?.();
-        }, delayDuration);
-      };
-
-      document.addEventListener("pointermove", handlePointerMove, {
-        passive: true,
-      });
-      cleanup = () => {
-        document.removeEventListener("pointermove", handlePointerMove);
-        anchor.removeEventListener("pointerleave", handlePointerLeave);
-        contentElement.removeEventListener("pointerleave", handlePointerLeave);
-      };
+      setSafeRectangle(safeRectangle);
     };
 
     anchor.addEventListener("pointerleave", handlePointerLeave);
     contentElement.addEventListener("pointerleave", handlePointerLeave);
-
     return () => {
       anchor.removeEventListener("pointerleave", handlePointerLeave);
       contentElement.removeEventListener("pointerleave", handlePointerLeave);
-      cleanup?.();
     };
-  }, [anchor, contentElement, delayDuration, placement, setStatus, status]);
+  }, [anchor, contentElement, placement, status]);
 
   return (
     <TooltipPrimitiveContentProvider
@@ -342,6 +341,7 @@ const TooltipArrow = ({
   );
 };
 
+/************************************ UTILS *************************************/
 function isInSide(
   point: { x: number; y: number },
   rect: { left: number; right: number; top: number; bottom: number },
@@ -354,7 +354,7 @@ function isInSide(
   );
 }
 
-function getGapFromRectByPlacement(
+function getSafeRectangleByPlacement(
   anchor: DOMRect,
   content: DOMRect,
   placement: Placement,
