@@ -228,18 +228,9 @@ const TooltipContent = ({
       );
 
       const handlePointerMove = (ev: PointerEvent) => {
-        const { clientX, clientY } = ev;
-
         if (!safeRectangle) return;
 
-        if (
-          anchor.contains(document.elementFromPoint(clientX, clientY)) ||
-          contentElement.contains(document.elementFromPoint(clientX, clientY))
-        ) {
-          return;
-        }
-
-        if (isInSide({ x: clientX, y: clientY }, safeRectangle)) {
+        if (isInSide({ x: ev.clientX, y: ev.clientY }, safeRectangle)) {
           return;
         }
 
@@ -373,8 +364,8 @@ function getGapFromRectByPlacement(
       return {
         left: content.left,
         right: content.right,
-        top: anchor.bottom,
-        bottom: content.top,
+        top: anchor.top,
+        bottom: content.bottom,
       };
     case "top":
       return {
@@ -385,15 +376,15 @@ function getGapFromRectByPlacement(
       };
     case "right":
       return {
-        left: anchor.right,
-        right: content.left,
+        left: anchor.left,
+        right: content.right,
         top: content.top,
         bottom: content.bottom,
       };
     case "left":
       return {
-        left: content.right,
-        right: anchor.left,
+        left: content.left,
+        right: anchor.right,
         top: content.top,
         bottom: content.bottom,
       };
