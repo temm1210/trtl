@@ -13,6 +13,16 @@ import {
 } from "./tooltip-primitive";
 
 describe("Tooltip primitive tests", () => {
+  beforeEach(() => {
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb: any) =>
+      cb(),
+    );
+  });
+
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
   test("controlled", async () => {
     const handleOpenChange = vi.fn();
 
@@ -58,6 +68,7 @@ describe("Tooltip primitive tests", () => {
 
     await userEvent.unhover(trigger);
 
+    expect(queryByRole("tooltip")).not.toBeInTheDocument();
     expect(handleOpenChange).toHaveBeenCalledTimes(2);
     expect(handleOpenChange).toHaveBeenCalledWith(false);
   });

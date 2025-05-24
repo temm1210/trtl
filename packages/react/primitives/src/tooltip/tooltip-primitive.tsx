@@ -106,19 +106,8 @@ const TooltipTrigger = ({ children, asChild }: TooltipTriggerProps) => {
     }, delayDuration);
   };
 
-  const handlePointerLeave = () => {
-    window.clearTimeout(timerRef.current);
-    timerRef.current = window.setTimeout(() => {
-      setStatus("exiting");
-    }, delayDuration);
-  };
-
   return (
-    <Comp
-      ref={setAnchor}
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
-    >
+    <Comp ref={setAnchor} onPointerEnter={handlePointerEnter}>
       {children}
     </Comp>
   );
@@ -133,7 +122,7 @@ export interface TooltipPortalProps {
 
 const TooltipPortal = ({
   container = document.body,
-  forceMount,
+  forceMount = false,
   children,
 }: TooltipPortalProps) => {
   const { open = true } = useTooltipPrimitiveContext();
@@ -175,7 +164,7 @@ const TooltipContent = ({
   ...restProps
 }: TooltipContentProps) => {
   const Comp = asChild ? Slot : "div";
-  const { anchor, open, status, setStatus, closeTooltip } =
+  const { anchor, open, status, setStatus, closeTooltip, delayDuration } =
     useTooltipPrimitiveContext();
 
   const [arrowELement, setArrowElement] = React.useState<HTMLElement | null>(
@@ -205,7 +194,7 @@ const TooltipContent = ({
 
   const contentElement = refs.floating.current;
 
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     if (!contentElement || status !== "exiting") return;
 
     const handleCloseTooltip = () => {
@@ -213,14 +202,72 @@ const TooltipContent = ({
       closeTooltip();
     };
 
-    if (hasTransition(contentElement)) {
-      contentElement.addEventListener("transitionend", handleCloseTooltip, {
-        once: true,
+    const animations = contentElement.getAnimations();
+
+    if (animations.length > 0) {
+      Promise.allSettled(animations.map((anim) => anim.finished)).then(() => {
+        handleCloseTooltip();
       });
     } else {
       handleCloseTooltip();
     }
   }, [closeTooltip, contentElement, setStatus, status]);
+
+  React.useLayoutEffect(() => {
+    if (status !== "mounted" || !anchor || !contentElement) return;
+
+    let cleanup: (() => void) | undefined;
+
+    const handlePointerLeave = () => {
+      const refRect = anchor.getBoundingClientRect();
+      const floRect = contentElement.getBoundingClientRect();
+      const safeRectangle = getGapFromRectByPlacement(
+        refRect,
+        floRect,
+        placement,
+      );
+
+      const handlePointerMove = (ev: PointerEvent) => {
+        const { clientX, clientY } = ev;
+
+        if (!safeRectangle) return;
+
+        if (
+          anchor.contains(document.elementFromPoint(clientX, clientY)) ||
+          contentElement.contains(document.elementFromPoint(clientX, clientY))
+        ) {
+          return;
+        }
+
+        if (isInSide({ x: clientX, y: clientY }, safeRectangle)) {
+          return;
+        }
+
+        setTimeout(() => {
+          setStatus("exiting");
+          cleanup?.();
+        }, delayDuration);
+      };
+
+      document.addEventListener("pointermove", handlePointerMove, {
+        passive: true,
+      });
+      cleanup = () => {
+        document.removeEventListener("pointermove", handlePointerMove);
+        anchor.removeEventListener("pointerleave", handlePointerLeave);
+        contentElement.removeEventListener("pointerleave", handlePointerLeave);
+      };
+    };
+
+    anchor.addEventListener("pointerleave", handlePointerLeave);
+    contentElement.addEventListener("pointerleave", handlePointerLeave);
+
+    return () => {
+      anchor.removeEventListener("pointerleave", handlePointerLeave);
+      contentElement.removeEventListener("pointerleave", handlePointerLeave);
+      cleanup?.();
+    };
+  }, [anchor, contentElement, delayDuration, placement, setStatus, status]);
 
   return (
     <TooltipPrimitiveContentProvider
@@ -237,6 +284,10 @@ const TooltipContent = ({
         ref={mergeRefs([refProp, refs.setFloating])}
         style={{ ...floatingStyles, ...style }}
         data-status={status}
+        data-open={open && status !== "exiting" ? "" : undefined}
+        data-closed={
+          status === "unmounted" || status === "exiting" ? "" : undefined
+        }
         {...restProps}
       >
         {children}
@@ -300,20 +351,56 @@ const TooltipArrow = ({
   );
 };
 
-function hasTransition(element: HTMLElement) {
-  const style = window.getComputedStyle(element);
-
-  const hasValidProperty = style.transitionProperty
-    .split(",")
-    .some((p) => p !== "none");
-
+function isInSide(
+  point: { x: number; y: number },
+  rect: { left: number; right: number; top: number; bottom: number },
+): boolean {
   return (
-    hasValidProperty &&
-    style.transitionDuration &&
-    style.transitionDuration !== "0s"
+    point.x > rect.left &&
+    point.x < rect.right &&
+    point.y > rect.top &&
+    point.y < rect.bottom
   );
 }
 
+function getGapFromRectByPlacement(
+  anchor: DOMRect,
+  content: DOMRect,
+  placement: Placement,
+) {
+  switch (placement) {
+    case "bottom":
+      return {
+        left: content.left,
+        right: content.right,
+        top: anchor.bottom,
+        bottom: content.top,
+      };
+    case "top":
+      return {
+        left: content.left,
+        right: content.right,
+        top: content.top,
+        bottom: anchor.bottom,
+      };
+    case "right":
+      return {
+        left: anchor.right,
+        right: content.left,
+        top: content.top,
+        bottom: content.bottom,
+      };
+    case "left":
+      return {
+        left: content.right,
+        right: anchor.left,
+        top: content.top,
+        bottom: content.bottom,
+      };
+    default:
+      return null;
+  }
+}
 export {
   TooltipArrow,
   TooltipContent,

@@ -11,7 +11,7 @@
   font-size: 0.875rem;
   border-radius: 0.25rem;
 
-  transition:
+  /* transition:
     opacity 200ms ease-in-out,
     transform 200ms ease-in-out;
 
@@ -22,9 +22,38 @@
   &[data-status="exiting"] {
     opacity: 0;
     transform: scale(0.7);
+  } */
+
+  &[data-open] {
+    animation: scaleIn 250ms ease-out;
+  }
+
+  &[data-closed] {
+    animation: scaleOut 250ms ease-in;
   }
 }
 
 .tooltip-trigger {
   cursor: pointer;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
 }
