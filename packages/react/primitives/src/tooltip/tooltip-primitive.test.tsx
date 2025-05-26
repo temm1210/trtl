@@ -13,16 +13,6 @@ import {
 } from "./tooltip-primitive";
 
 describe("Tooltip primitive tests", () => {
-  beforeEach(() => {
-    vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb: any) =>
-      cb(),
-    );
-  });
-
-  afterEach(() => {
-    vi.resetAllMocks();
-  });
-
   test("controlled", async () => {
     const handleOpenChange = vi.fn();
 
@@ -97,8 +87,12 @@ describe("Tooltip primitive tests", () => {
   });
 
   test("delayDuration prop should work correctly", async () => {
-    // https://github.com/testing-library/dom-testing-library/issues/987#issuecomment-1266266801
-    vi.useFakeTimers({ shouldAdvanceTime: true });
+    // https://github.com/testing-library/react-testing-library/issues/1197
+    // https://github.com/testing-library/user-event/issues/1115
+    vi.stubGlobal("jest", {
+      advanceTimersByTime: vi.advanceTimersByTime.bind(vi),
+    });
+    vi.useFakeTimers();
 
     const DELAY_TIME = 2500;
     const { userEvent, getByTestId, queryByRole, getByRole } = render(
@@ -111,7 +105,7 @@ describe("Tooltip primitive tests", () => {
         </TooltipPortal>
       </TooltipRoot>,
       {
-        advanceTimers: vi.advanceTimersByTime,
+        advanceTimers: vi.advanceTimersByTime.bind(vi),
       },
     );
 

@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import ReactDOM from "react-dom";
+
 import {
   arrow,
   autoUpdate,
@@ -60,7 +62,9 @@ const TooltipRoot = ({
       onOpenChangeProp?.(true);
 
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => setStatus("mounted"));
+        requestAnimationFrame(() => {
+          setStatus("mounted");
+        });
       });
     }, delayDuration);
   }, [delayDuration, onOpenChangeProp]);
@@ -74,10 +78,9 @@ const TooltipRoot = ({
   const handleDelayedExiting = React.useCallback(() => {
     window.clearTimeout(timerRef.current);
 
-    timerRef.current = window.setTimeout(
-      () => setStatus("exiting"),
-      delayDuration,
-    );
+    timerRef.current = window.setTimeout(() => {
+      setStatus("exiting");
+    }, delayDuration);
   }, [delayDuration]);
 
   React.useEffect(() => {
@@ -143,8 +146,7 @@ const TooltipPortal = ({
   ) : null;
 };
 
-/************************************ CONTENT CONTEXT*************************************/
-
+/************************************ CONTENT *************************************/
 type Placement = "top" | "right" | "bottom" | "left";
 interface TooltipContentContextValue {
   arrow: HTMLElement | null;
@@ -157,7 +159,6 @@ interface TooltipContentContextValue {
 const [TooltipPrimitiveContentProvider, useTooltipPrimitiveContentContext] =
   createContext<TooltipContentContextValue>();
 
-/************************************ CONTENT *************************************/
 export interface TooltipContentProps
   extends React.ComponentPropsWithRef<"div"> {
   asChild?: boolean;
@@ -221,7 +222,10 @@ const TooltipContent = ({
 
     if (animations.length > 0) {
       Promise.allSettled(animations.map((anim) => anim.finished)).then(() => {
-        closeTooltip();
+        // or forward
+        ReactDOM.flushSync(() => {
+          closeTooltip();
+        });
       });
     } else {
       closeTooltip();
@@ -235,6 +239,7 @@ const TooltipContent = ({
       if (isInSide({ x: ev.clientX, y: ev.clientY }, safeRectangle)) {
         return;
       }
+
       startExitingTooltip();
     };
 
@@ -282,8 +287,10 @@ const TooltipContent = ({
         ref={mergeRefs([refProp, refs.setFloating])}
         style={{ ...floatingStyles, ...style }}
         data-status={status}
-        data-open={open ? "" : undefined}
-        data-closed={status === "exiting" ? "" : undefined}
+        data-open={open && status !== "exiting" ? "" : undefined}
+        data-closed={
+          status === "unmounted" || status === "exiting" ? "" : undefined
+        }
         {...restProps}
       >
         {children}
