@@ -10,7 +10,8 @@ interface CheckboxContextValue {
 const [CheckboxPrimitiveProvider, useCheckboxPrimitiveContext] =
   createContext<CheckboxContextValue>();
 
-export interface CheckboxRootProps extends React.ComponentPropsWithRef<"input"> {
+export interface CheckboxRootProps
+  extends React.ComponentPropsWithRef<"input"> {
   onCheckedChange?: (checked: boolean) => void;
 }
 
@@ -26,7 +27,9 @@ const CheckboxRoot = (props: CheckboxRootProps) => {
     onChange,
     ...inputProps
   } = props;
-  const [clickedState, setClickedState] = React.useState(defaultChecked ?? false);
+  const [clickedState, setClickedState] = React.useState(
+    defaultChecked ?? false,
+  );
 
   const isControlled = checkedProp !== undefined;
   const checked = isControlled ? checkedProp : clickedState;
@@ -68,16 +71,19 @@ const CheckboxRoot = (props: CheckboxRootProps) => {
           disabled={disabled}
           {...inputProps}
         />
-
         {children}
       </label>
     </CheckboxPrimitiveProvider>
   );
 };
 
-export interface CheckboxIndicatorProps extends React.ComponentPropsWithRef<"div"> {}
+export interface CheckboxIndicatorProps
+  extends React.ComponentPropsWithRef<"div"> {}
 
-const CheckboxIndicator = ({ children, ...restProps }: CheckboxIndicatorProps) => {
+const CheckboxIndicator = ({
+  children,
+  ...restProps
+}: CheckboxIndicatorProps) => {
   const { checked, disabled } = useCheckboxPrimitiveContext();
 
   const dataAttribute = getDataAttribute(checked, disabled);
@@ -89,7 +95,10 @@ const CheckboxIndicator = ({ children, ...restProps }: CheckboxIndicatorProps) =
   );
 };
 
-function getDataAttribute(checked: boolean | undefined, disabled: boolean | undefined) {
+function getDataAttribute(
+  checked: boolean | undefined,
+  disabled: boolean | undefined,
+) {
   return {
     "data-state": checked ? "checked" : "unchecked",
     "data-disabled": disabled ? "" : undefined,
