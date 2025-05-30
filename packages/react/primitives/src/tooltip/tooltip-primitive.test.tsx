@@ -1,7 +1,7 @@
 import React from "react";
 
 import { render } from "@rtl/react-utils";
-import { act } from "@testing-library/react";
+import { act, waitFor } from "@testing-library/react";
 
 import {
   TooltipArrow,
@@ -26,11 +26,8 @@ describe("Tooltip primitive tests", () => {
             setOpen(open);
             handleOpenChange(open);
           }}
-          delayDuration={0}
         >
-          <TooltipTrigger asChild>
-            <span data-testid="test-trigger">trigger</span>
-          </TooltipTrigger>
+          <TooltipTrigger data-testid="test-trigger">trigger</TooltipTrigger>
           <TooltipPortal>
             <TooltipContent>
               <TooltipArrow />
@@ -52,23 +49,25 @@ describe("Tooltip primitive tests", () => {
 
     await userEvent.hover(trigger);
 
-    expect(getByRole("tooltip")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(getByRole("tooltip")).toBeInTheDocument();
+    });
     expect(handleOpenChange).toHaveBeenCalledTimes(1);
     expect(handleOpenChange).toHaveBeenCalledWith(true);
 
     await userEvent.unhover(trigger);
 
-    expect(queryByRole("tooltip")).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(queryByRole("tooltip")).not.toBeInTheDocument();
+    });
     expect(handleOpenChange).toHaveBeenCalledTimes(2);
     expect(handleOpenChange).toHaveBeenCalledWith(false);
   });
 
   test("uncontrolled", async () => {
     const { userEvent, getByTestId, queryByRole, getByRole } = render(
-      <TooltipRoot delayDuration={0}>
-        <TooltipTrigger asChild>
-          <span data-testid="test-trigger">trigger</span>
-        </TooltipTrigger>
+      <TooltipRoot>
+        <TooltipTrigger data-testid="test-trigger">trigger</TooltipTrigger>
         <TooltipPortal>
           <TooltipContent>Content</TooltipContent>
         </TooltipPortal>
@@ -80,10 +79,14 @@ describe("Tooltip primitive tests", () => {
     const trigger = getByTestId("test-trigger");
 
     await userEvent.hover(trigger);
-    expect(getByRole("tooltip")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(getByRole("tooltip")).toBeInTheDocument();
+    });
 
     await userEvent.unhover(trigger);
-    expect(queryByRole("tooltip")).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(queryByRole("tooltip")).not.toBeInTheDocument();
+    });
   });
 
   test("delayDuration prop should work correctly", async () => {
@@ -97,9 +100,7 @@ describe("Tooltip primitive tests", () => {
     const DELAY_TIME = 2500;
     const { userEvent, getByTestId, queryByRole, getByRole } = render(
       <TooltipRoot delayDuration={DELAY_TIME}>
-        <TooltipTrigger asChild>
-          <span data-testid="test-trigger">trigger</span>
-        </TooltipTrigger>
+        <TooltipTrigger data-testid="test-trigger">trigger</TooltipTrigger>
         <TooltipPortal>
           <TooltipContent>Content</TooltipContent>
         </TooltipPortal>
@@ -136,7 +137,7 @@ describe("Tooltip primitive tests", () => {
   test("disabled", async () => {
     const Tooltip = (props: TooltipRootProps) => {
       return (
-        <TooltipRoot disabled delayDuration={0} {...props}>
+        <TooltipRoot disabled {...props}>
           <TooltipTrigger asChild>
             <span data-testid="test-trigger">trigger</span>
           </TooltipTrigger>
@@ -166,7 +167,7 @@ describe("Tooltip primitive tests", () => {
 
   test("defaultOpen", async () => {
     const { getByRole } = render(
-      <TooltipRoot defaultOpen delayDuration={0}>
+      <TooltipRoot defaultOpen>
         <TooltipTrigger>trigger</TooltipTrigger>
         <TooltipPortal>
           <TooltipContent>
@@ -183,7 +184,7 @@ describe("Tooltip primitive tests", () => {
 
   test("portal forceMount", async () => {
     const { getByRole } = render(
-      <TooltipRoot delayDuration={0}>
+      <TooltipRoot>
         <TooltipTrigger>trigger</TooltipTrigger>
         <TooltipPortal forceMount>
           <TooltipContent>

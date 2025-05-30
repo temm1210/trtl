@@ -115,13 +115,17 @@ export interface TooltipTriggerProps
   asChild?: boolean;
 }
 
-const TooltipTrigger = ({ children, asChild }: TooltipTriggerProps) => {
+const TooltipTrigger = ({
+  children,
+  asChild,
+  ...restProps
+}: TooltipTriggerProps) => {
   const Comp = asChild ? Slot : "button";
 
   const { setAnchor, openTooltip } = useTooltipPrimitiveContext();
 
   return (
-    <Comp ref={setAnchor} onPointerEnter={openTooltip}>
+    <Comp ref={setAnchor} onPointerEnter={openTooltip} {...restProps}>
       {children}
     </Comp>
   );
@@ -316,9 +320,9 @@ const TooltipArrow = ({
 
   const TRANSFORM: Record<Placement, string> = {
     top: "translateY(100%)",
-    right: "translateY(50%) rotate(90deg) translateX(-50%)",
+    right: "rotate(90deg)",
     bottom: `rotate(180deg)`,
-    left: "translateY(50%) rotate(-90deg) translateX(50%)",
+    left: "rotate(-90deg)",
   };
 
   const OPPOSITE_PLACEMENT: Record<Placement, Placement> = {
