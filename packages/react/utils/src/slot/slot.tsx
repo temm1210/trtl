@@ -16,7 +16,7 @@ const Slot = ({ children, ...slotProps }: SlotProps) => {
   });
 
   if (slottableElements.length > 1) {
-    throw Error("Slottable must be one");
+    throw Error("Slot must have exactly one child");
   }
 
   if (slottableElements.length === 1) {
@@ -25,11 +25,13 @@ const Slot = ({ children, ...slotProps }: SlotProps) => {
       typeof Slottable
     >;
 
-    const slottableChildren = slottableElement.props.children as React.ReactElement;
+    const slottableChildren = slottableElement.props.children;
 
     const nextSlottableChildren = childrenAsArray.map((child) => {
       if (child === slottableElement) {
-        return (slottableChildren.props as { children: React.ReactNode }).children;
+        return React.isValidElement(slottableChildren)
+          ? (slottableChildren.props as { children: React.ReactNode }).children
+          : null;
       } else {
         return child;
       }
@@ -37,7 +39,13 @@ const Slot = ({ children, ...slotProps }: SlotProps) => {
 
     return (
       <SlotCloneElement {...slotProps}>
-        {React.cloneElement(slottableChildren, undefined, nextSlottableChildren)}
+        {React.isValidElement(slottableChildren)
+          ? React.cloneElement(
+              slottableChildren,
+              undefined,
+              nextSlottableChildren,
+            )
+          : null}
       </SlotCloneElement>
     );
   }
@@ -55,12 +63,21 @@ const Slot = ({ children, ...slotProps }: SlotProps) => {
 
 // ****************** SlotCloneElement ***************************
 interface SlotCloneElementProps extends React.HTMLAttributes<HTMLElement> {
-  children: React.ReactElement;
+  children: React.ReactNode;
   ref?: React.Ref<HTMLElement>;
 }
 
-const SlotCloneElement = ({ children, ...slotProps }: SlotCloneElementProps) => {
-  const child = React.Children.only(children) as React.ReactElement<HTMLElement>;
+const SlotCloneElement = ({
+  children,
+  ...slotProps
+}: SlotCloneElementProps) => {
+  if (!React.isValidElement(children)) {
+    return null;
+  }
+
+  const child = React.Children.only(
+    children,
+  ) as React.ReactElement<HTMLElement>;
 
   const props = mergeProps(slotProps, child.props);
 
@@ -71,7 +88,9 @@ const SlotCloneElement = ({ children, ...slotProps }: SlotCloneElementProps) => 
     props.ref = mergeRefs([childRef, slotRef]);
   }
 
-  return React.cloneElement(children, props);
+  return React.isValidElement(children)
+    ? React.cloneElement(children, props)
+    : null;
 };
 
 // ****************** Slottable ***************************
@@ -79,7 +98,10 @@ const Slottable = ({ children }: { children: React.ReactNode }) => {
   return children;
 };
 
-function mergeProps(slotProps: Record<string, any>, childProps: Record<string, any>) {
+function mergeProps(
+  slotProps: Record<string, any>,
+  childProps: Record<string, any>,
+) {
   const mergedProps: Record<string, any> = { ...slotProps, ...childProps };
 
   Object.keys(mergedProps)
@@ -96,7 +118,9 @@ function mergeProps(slotProps: Record<string, any>, childProps: Record<string, a
   }
 
   if (slotProps.className) {
-    mergedProps.className = [slotProps.className, childProps.className].join(" ");
+    mergedProps.className = [slotProps.className, childProps.className].join(
+      " ",
+    );
   }
 
   return mergedProps;

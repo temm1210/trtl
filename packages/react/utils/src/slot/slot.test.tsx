@@ -33,7 +33,9 @@ describe("Slot tests", () => {
         </div>
     `;
 
-    expect(dom.container.innerHTML).toMatchInlineSnapshot(`"${serialize(result)}"`);
+    expect(dom.container.innerHTML).toMatchInlineSnapshot(
+      `"${serialize(result)}"`,
+    );
   });
 
   test("pass Slot props to its chid and merge it", async () => {
@@ -47,7 +49,11 @@ describe("Slot tests", () => {
         style={{ color: "red" }}
         onClick={handleSlotClick}
       >
-        <p className="child" style={{ backgroundColor: "red" }} onClick={handleSlotChildClick}>
+        <p
+          className="child"
+          style={{ backgroundColor: "red" }}
+          onClick={handleSlotChildClick}
+        >
           <span>span</span>
         </p>
       </Slot>,
@@ -152,7 +158,7 @@ describe("Slot tests", () => {
           <div>div2</div>
         </Slot>,
       ),
-    ).toThrowError("Slottable must be one");
+    ).toThrowError("Slot must have exactly one child");
   });
 
   test("merge Slottable child ref and slot ref", () => {
