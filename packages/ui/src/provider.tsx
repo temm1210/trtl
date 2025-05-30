@@ -1,8 +1,6 @@
 import { Global } from "@emotion/react";
 import { createContext } from "@rtl/react-utils";
 
-import * as defaultCss from "./reset.css";
-
 export interface RtlContextProps {}
 
 const [RtlContextProvider, useProviderRtlContext] =
@@ -16,7 +14,7 @@ export interface ProviderProps {
 function RtlProvider({ children, styles }: ProviderProps) {
   return (
     <RtlContextProvider value={{}}>
-      <Global styles={styles ?? defaultCss} />
+      <Global styles={styles} />
       {children}
     </RtlContextProvider>
   );
