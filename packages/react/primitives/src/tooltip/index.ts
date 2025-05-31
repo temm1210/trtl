@@ -8,6 +8,7 @@ import {
 
 export type {
   TooltipContentProps,
+  Placement as TooltipPlaceMent,
   TooltipPortalProps,
   TooltipRootProps,
   TooltipTriggerProps,

@@ -151,7 +151,7 @@ const TooltipPortal = ({
 };
 
 /************************************ CONTENT *************************************/
-type Placement = "top" | "right" | "bottom" | "left";
+export type Placement = "top" | "right" | "bottom" | "left";
 interface TooltipContentContextValue {
   arrow: HTMLElement | null;
   setArrow: (arrow: HTMLElement | null) => void;
