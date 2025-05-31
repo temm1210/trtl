@@ -291,7 +291,7 @@ const TooltipContent = ({
         ref={mergeRefs([refProp, refs.setFloating])}
         style={{ ...floatingStyles, ...style }}
         data-status={status}
-        data-open={open && status !== "exiting" ? "" : undefined}
+        data-open={open && status !== "unmounted" ? "" : undefined}
         data-closed={
           status === "unmounted" || status === "exiting" ? "" : undefined
         }
