@@ -170,11 +170,9 @@ export interface TooltipContentProps
   offset?: number;
 }
 
-interface SafeRectangleArea {
-  left: number;
-  right: number;
-  top: number;
-  bottom: number;
+interface Point {
+  x: number;
+  y: number;
 }
 
 const TooltipContent = ({
@@ -190,8 +188,7 @@ const TooltipContent = ({
 
   const { anchor, open, status, startExitingTooltip, closeTooltip } =
     useTooltipPrimitiveContext();
-  const [safeRectangle, setSafeRectangle] =
-    React.useState<SafeRectangleArea | null>(null);
+  const [safePolygon, setSafePolygon] = React.useState<Point[] | null>(null);
   const [arrowELement, setArrowElement] = React.useState<HTMLElement | null>(
     null,
   );
@@ -237,10 +234,10 @@ const TooltipContent = ({
   }, [closeTooltip, contentElement, status]);
 
   React.useEffect(() => {
-    if (!safeRectangle) return;
+    if (!safePolygon) return;
 
     const handlePointerMove = (ev: PointerEvent) => {
-      if (isInSide({ x: ev.clientX, y: ev.clientY }, safeRectangle)) {
+      if (isPointInPolygon({ x: ev.clientX, y: ev.clientY }, safePolygon)) {
         return;
       }
 
@@ -251,7 +248,7 @@ const TooltipContent = ({
       passive: true,
     });
     return () => document.removeEventListener("pointermove", handlePointerMove);
-  }, [startExitingTooltip, safeRectangle]);
+  }, [startExitingTooltip, safePolygon]);
 
   React.useEffect(() => {
     if (!anchor || !contentElement) return;
@@ -259,13 +256,9 @@ const TooltipContent = ({
     const handlePointerLeave = () => {
       const refRect = anchor.getBoundingClientRect();
       const floRect = contentElement.getBoundingClientRect();
-      const safeRectangle = getSafeRectangleByPlacement(
-        refRect,
-        floRect,
-        placement,
-      );
+      const safePolygon = calculateSafePolygon(refRect, floRect, placement);
 
-      setSafeRectangle(safeRectangle);
+      setSafePolygon(safePolygon);
     };
 
     anchor.addEventListener("pointerleave", handlePointerLeave);
@@ -286,6 +279,7 @@ const TooltipContent = ({
         placement,
       }}
     >
+      <SafeAreaOverlay points={safePolygon} />
       <Comp
         role="tooltip"
         ref={mergeRefs([refProp, refs.setFloating])}
@@ -358,57 +352,123 @@ const TooltipArrow = ({
   );
 };
 
-/************************************ UTILS *************************************/
-function isInSide(
-  point: { x: number; y: number },
-  rect: { left: number; right: number; top: number; bottom: number },
-): boolean {
-  return (
-    point.x > rect.left &&
-    point.x < rect.right &&
-    point.y > rect.top &&
-    point.y < rect.bottom
-  );
+const SafeAreaOverlay: React.FC<{
+  points: Point[] | null;
+}> = ({ points: pointsProp }) => {
+  const points = pointsProp?.map(({ x, y }) => `${x},${y}`).join(" ");
+
+  return points ? (
+    <svg
+      style={{
+        position: "fixed",
+        width: "100vw",
+        height: "100vh",
+        pointerEvents: "none",
+        zIndex: 9999,
+      }}
+    >
+      <polygon
+        points={points}
+        fill="rgba(255,165,0,0.15)" /* 연한 주황 투명 채우기 */
+        stroke="rgba(255,165,0,0.9)" /* 진한 주황 테두리 */
+        strokeWidth="2"
+      />
+    </svg>
+  ) : null;
+};
+
+function isPointInPolygon(targetPoint: Point, polygonPoints: Point[]): boolean {
+  let isInside = false;
+
+  let i = 0;
+  let j = polygonPoints.length - 1;
+
+  while (i < polygonPoints.length) {
+    const currentPoint = polygonPoints[i];
+    const prevPoint = polygonPoints[j];
+
+    if (!currentPoint || !prevPoint) continue;
+
+    const currentX = currentPoint.x;
+    const currentY = currentPoint.y;
+    const xj = prevPoint.x;
+    const yj = prevPoint.y;
+
+    const intersect =
+      currentY > targetPoint.y !== yj > targetPoint.y &&
+      targetPoint.x <
+        ((xj - currentX) * (targetPoint.y - currentY)) / (yj - currentY) +
+          currentX;
+
+    if (intersect) {
+      isInside = !isInside;
+    }
+
+    j = i++;
+  }
+
+  return isInside;
 }
 
-function getSafeRectangleByPlacement(
+function calculateSafePolygon(
   anchor: DOMRect,
   content: DOMRect,
-  placement: Placement,
-) {
+  placement: "top" | "bottom" | "right" | "left",
+): { x: number; y: number }[] {
   switch (placement) {
-    case "bottom":
-      return {
-        left: content.left,
-        right: content.right,
-        top: anchor.top,
-        bottom: content.bottom,
-      };
     case "top":
-      return {
-        left: content.left,
-        right: content.right,
-        top: content.top,
-        bottom: anchor.bottom,
-      };
+      return [
+        { x: content.left, y: content.top },
+        { x: content.right, y: content.top },
+        { x: content.right, y: anchor.top },
+        { x: anchor.right, y: anchor.top },
+        { x: anchor.right, y: anchor.bottom },
+        { x: anchor.left, y: anchor.bottom },
+        { x: anchor.left, y: anchor.top },
+        { x: content.left, y: anchor.top },
+      ];
+
     case "right":
-      return {
-        left: anchor.left,
-        right: content.right,
-        top: content.top,
-        bottom: content.bottom,
-      };
+      return [
+        { x: anchor.left, y: anchor.top },
+        { x: anchor.right, y: anchor.top },
+        { x: anchor.right, y: content.top },
+        { x: content.right, y: content.top },
+        { x: content.right, y: content.bottom },
+        { x: anchor.right, y: content.bottom },
+        { x: anchor.right, y: anchor.bottom },
+        { x: anchor.left, y: anchor.bottom },
+      ];
+
+    case "bottom":
+      return [
+        { x: anchor.left, y: anchor.top },
+        { x: anchor.right, y: anchor.top },
+        { x: anchor.right, y: anchor.bottom },
+        { x: content.right, y: anchor.bottom },
+        { x: content.right, y: content.bottom },
+        { x: content.left, y: content.bottom },
+        { x: content.left, y: anchor.bottom },
+        { x: anchor.left, y: anchor.bottom },
+      ];
+
     case "left":
-      return {
-        left: content.left,
-        right: anchor.right,
-        top: content.top,
-        bottom: content.bottom,
-      };
+      return [
+        { x: content.left, y: content.top },
+        { x: anchor.left, y: content.top },
+        { x: anchor.left, y: anchor.top },
+        { x: anchor.right, y: anchor.top },
+        { x: anchor.right, y: anchor.bottom },
+        { x: anchor.left, y: anchor.bottom },
+        { x: anchor.left, y: content.bottom },
+        { x: content.left, y: content.bottom },
+      ];
+
     default:
-      return null;
+      return [];
   }
 }
+
 export {
   TooltipArrow,
   TooltipContent,
