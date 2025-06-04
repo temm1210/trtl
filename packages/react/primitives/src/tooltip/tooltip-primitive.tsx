@@ -369,8 +369,8 @@ const SafeAreaOverlay: React.FC<{
     >
       <polygon
         points={points}
-        fill="rgba(255,165,0,0.15)" /* 연한 주황 투명 채우기 */
-        stroke="rgba(255,165,0,0.9)" /* 진한 주황 테두리 */
+        fill="rgba(255,165,0,0.15)"
+        stroke="rgba(255,165,0,0.9)"
         strokeWidth="2"
       />
     </svg>
@@ -379,32 +379,31 @@ const SafeAreaOverlay: React.FC<{
 
 function isPointInPolygon(targetPoint: Point, polygonPoints: Point[]): boolean {
   let isInside = false;
+  const pointCount = polygonPoints.length;
 
-  let i = 0;
-  let j = polygonPoints.length - 1;
-
-  while (i < polygonPoints.length) {
+  for (let i = 0; i < polygonPoints.length; i++) {
     const currentPoint = polygonPoints[i];
-    const prevPoint = polygonPoints[j];
+    const nextPoint = polygonPoints[(i + 1) % pointCount];
 
-    if (!currentPoint || !prevPoint) continue;
+    if (!currentPoint || !nextPoint) continue;
 
     const currentX = currentPoint.x;
     const currentY = currentPoint.y;
-    const xj = prevPoint.x;
-    const yj = prevPoint.y;
+    const nextX = nextPoint.x;
+    const nextY = nextPoint.y;
 
     const intersect =
-      currentY > targetPoint.y !== yj > targetPoint.y &&
+      currentY > targetPoint.y !== nextY > targetPoint.y &&
+      /**
+       * 해당식은 currentPoint와 prevPoint를 잇는 선분(CP라고 가정)의 기울기를 이용하여 교차지점인 x를 구하는 식
+       */
       targetPoint.x <
-        ((xj - currentX) * (targetPoint.y - currentY)) / (yj - currentY) +
+        ((nextX - currentX) * (targetPoint.y - currentY)) / (nextY - currentY) +
           currentX;
 
     if (intersect) {
       isInside = !isInside;
     }
-
-    j = i++;
   }
 
   return isInside;
