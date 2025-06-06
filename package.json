@@ -7,6 +7,7 @@
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
     "test": "turbo run test",
+    "test:e2e": "pnpm exec playwright test",
     "ui:storybook": "turbo run storybook --filter=@rtl/ui",
     "prepare": "husky"
   },

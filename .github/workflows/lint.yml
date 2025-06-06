@@ -1,0 +1,20 @@
+name: Lint
+
+on:
+  push:
+    branches: [playwright]
+  pull_request:
+    branches: [playwright]
+
+jobs:
+  lint-and-types:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Project
+        uses: ./.github/actions/setup
+
+      - name: Run Lint
+        run: pnpm turbo run lint
+
+      - name: Run Typecheck
+        run: pnpm turbo run check-types
