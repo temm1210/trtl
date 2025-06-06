@@ -3,11 +3,6 @@ description: Common setup steps (checkout, node, pnpm, install)
 runs:
   using: "composite"
   steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 3
-
     - name: Setup pnpm
       uses: pnpm/action-setup@v4
       with:
