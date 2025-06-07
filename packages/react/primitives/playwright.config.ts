@@ -14,12 +14,11 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
-    command: "pnpm storybook",
+    command: "pnpm run storybook",
     url: STORYBOOK_URL,
     timeout: 60 * 1000,
     reuseExistingServer: !process.env.CI,
   },
-
   projects: [
     {
       name: "chromium",

@@ -5,8 +5,10 @@
   "type": "module",
   "main": "./src/index.ts",
   "scripts": {
-    "test": "vitest run",
+    "test": "pnpm run test:unit && pnpm run test:e2e",
+    "test:unit": "vitest run",
     "test:watch": "vitest watch",
+    "test:e2e": "pnpm exec playwright test",
     "coverage": "vitest run --coverage",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
