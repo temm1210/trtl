@@ -1,0 +1,39 @@
+import {
+  ArgTypes,
+  Canvas,
+  Description,
+  Meta,
+  Source,
+  Story,
+} from "@storybook/blocks";
+
+import { TooltipContent, TooltipRoot } from "./tooltip-primitive";
+import * as TooltipStories from "./tooltip-primitive.stories";
+
+<Meta title="Primitives/Tooltip" of={TooltipStories} />
+
+# Tooltip
+
+<Canvas>
+  <Story of={TooltipStories.Base} />
+</Canvas>
+
+### Root Props
+
+<ArgTypes of={TooltipRoot} />
+
+### Content Props
+
+<ArgTypes of={TooltipContent} />
+
+### Base
+
+<Canvas>
+  <Story of={TooltipStories.Base} />
+</Canvas>
+
+### Delay Duration
+
+<Canvas>
+  <Story of={TooltipStories.DelayDuration} />
+</Canvas>

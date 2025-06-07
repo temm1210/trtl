@@ -10,7 +10,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
   use: {
-    baseURL: STORYBOOK_URL,
+    baseURL: `${STORYBOOK_URL}/iframe.html?id=primitives-`,
     trace: "on-first-retry",
   },
   webServer: {

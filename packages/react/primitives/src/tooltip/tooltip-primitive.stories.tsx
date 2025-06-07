@@ -8,7 +8,10 @@ const meta: Meta<typeof Tooltip> = {
   parameters: {
     layout: "centered",
   },
-  tags: ["autodocs"],
+  argTypes: {
+    children: { control: false },
+  },
+  // tags: ["autodocs"],
 };
 
 export default meta;

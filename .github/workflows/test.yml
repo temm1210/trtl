@@ -2,9 +2,9 @@ name: Tests
 
 on:
   push:
-    branches: [playwright]
+    branches: [main]
   pull_request:
-    branches: [playwright]
+    branches: [main]
 
 jobs:
   test:
