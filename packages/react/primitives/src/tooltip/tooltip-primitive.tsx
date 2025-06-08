@@ -19,6 +19,7 @@ interface TooltipContextValue {
   anchor: HTMLElement | null;
   setAnchor: (anchor: HTMLElement | null) => void;
   open: boolean;
+  dataAttribute: Record<string, any>;
   openTooltip: () => void;
   closeTooltip: () => void;
   startExitingTooltip: () => void;
@@ -46,8 +47,11 @@ const TooltipRoot = ({
   defaultOpen,
 }: TooltipRootProps) => {
   const [isOpen, setIsOpen] = React.useState(defaultOpen ?? false);
-  const [status, setStatus] = React.useState<Status>("unmounted");
+  const [status, setStatus] = React.useState<Status>(
+    defaultOpen ? "mounted" : "unmounted",
+  );
   const [anchor, setAnchor] = React.useState<HTMLElement | null>(null);
+
   const timerRef = React.useRef(0);
 
   const isControlled = openProp !== undefined;
@@ -83,6 +87,16 @@ const TooltipRoot = ({
     }, delayDuration);
   }, [delayDuration]);
 
+  const dataAttribute = React.useMemo(() => {
+    return {
+      "data-entering": status === "entering" ? "" : undefined,
+      "data-exiting": status === "exiting" ? "" : undefined,
+      "data-open": status !== "unmounted" ? "" : undefined,
+      "data-close":
+        status === "unmounted" || status === "exiting" ? "" : undefined,
+    };
+  }, [status]);
+
   React.useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -98,6 +112,7 @@ const TooltipRoot = ({
         anchor,
         setAnchor,
         status,
+        dataAttribute,
         openTooltip: handleOpenTooltip,
         closeTooltip: handleCloseTooltip,
         startExitingTooltip: handleDelayedExiting,
@@ -122,10 +137,16 @@ const TooltipTrigger = ({
 }: TooltipTriggerProps) => {
   const Comp = asChild ? Slot : "button";
 
-  const { setAnchor, openTooltip } = useTooltipPrimitiveContext();
+  const { setAnchor, openTooltip, dataAttribute } =
+    useTooltipPrimitiveContext();
 
   return (
-    <Comp ref={setAnchor} onPointerEnter={openTooltip} {...restProps}>
+    <Comp
+      ref={setAnchor}
+      onPointerEnter={openTooltip}
+      {...dataAttribute}
+      {...restProps}
+    >
       {children}
     </Comp>
   );
@@ -186,8 +207,14 @@ const TooltipContent = ({
 }: TooltipContentProps) => {
   const Comp = asChild ? Slot : "div";
 
-  const { anchor, open, status, startExitingTooltip, closeTooltip } =
-    useTooltipPrimitiveContext();
+  const {
+    anchor,
+    open,
+    status,
+    dataAttribute,
+    startExitingTooltip,
+    closeTooltip,
+  } = useTooltipPrimitiveContext();
   const [safePolygon, setSafePolygon] = React.useState<Point[] | null>(null);
   const [arrowELement, setArrowElement] = React.useState<HTMLElement | null>(
     null,
@@ -284,11 +311,7 @@ const TooltipContent = ({
         role="tooltip"
         ref={mergeRefs([refProp, refs.setFloating])}
         style={{ ...floatingStyles, ...style }}
-        data-status={status}
-        data-open={open && status !== "unmounted" ? "" : undefined}
-        data-closed={
-          status === "unmounted" || status === "exiting" ? "" : undefined
-        }
+        {...dataAttribute}
         {...restProps}
       >
         {children}
