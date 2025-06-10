@@ -3,15 +3,16 @@ import { defineConfig, devices } from "@playwright/test";
 const STORYBOOK_URL = "http://localhost:6006";
 
 export default defineConfig({
-  testDir: "./e2e",
+  testDir: "./playwright/tests",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
   use: {
-    baseURL: `${STORYBOOK_URL}/iframe.html?id=primitives-`,
+    baseURL: `${STORYBOOK_URL}/iframe.html`,
     trace: "on-first-retry",
+    viewport: { width: 1280, height: 720 },
   },
   webServer: {
     command: "pnpm run storybook",
