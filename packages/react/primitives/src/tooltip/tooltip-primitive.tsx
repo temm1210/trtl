@@ -91,7 +91,8 @@ const TooltipRoot = ({
     return {
       "data-entering": status === "entering" ? "" : undefined,
       "data-exiting": status === "exiting" ? "" : undefined,
-      "data-open": status !== "unmounted" ? "" : undefined,
+      "data-open":
+        status === "entering" || status === "mounted" ? "" : undefined,
       "data-close":
         status === "unmounted" || status === "exiting" ? "" : undefined,
     };

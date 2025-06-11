@@ -52,6 +52,7 @@ describe("Tooltip primitive tests", () => {
     await waitFor(() => {
       expect(getByRole("tooltip")).toBeInTheDocument();
     });
+
     expect(handleOpenChange).toHaveBeenCalledTimes(1);
     expect(handleOpenChange).toHaveBeenCalledWith(true);
 
@@ -60,6 +61,7 @@ describe("Tooltip primitive tests", () => {
     await waitFor(() => {
       expect(queryByRole("tooltip")).not.toBeInTheDocument();
     });
+
     expect(handleOpenChange).toHaveBeenCalledTimes(2);
     expect(handleOpenChange).toHaveBeenCalledWith(false);
   });
@@ -79,6 +81,7 @@ describe("Tooltip primitive tests", () => {
     const trigger = getByTestId("test-trigger");
 
     await userEvent.hover(trigger);
+
     await waitFor(() => {
       expect(getByRole("tooltip")).toBeInTheDocument();
     });
