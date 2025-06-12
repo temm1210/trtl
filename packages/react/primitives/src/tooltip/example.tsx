@@ -1,12 +1,42 @@
 import { ArrowDownFillIcon } from "@rtl/icons";
 
-import { TooltipContentProps, TooltipPrimitive, TooltipRootProps } from "./";
+import style from "./example.module.css";
 
-import "./example.css";
+import { TooltipContentProps, TooltipPrimitive, TooltipRootProps } from "./";
 
 export interface TooltipProps extends TooltipRootProps, TooltipContentProps {}
 
-const Example = ({ placement, offset, ...rootProps }: TooltipProps) => {
+export const StyledTooltip = ({
+  placement,
+  offset,
+  ...rootProps
+}: TooltipProps) => {
+  return (
+    <TooltipPrimitive.Root {...rootProps}>
+      <TooltipPrimitive.Trigger asChild>
+        <span className={style.tooltipTrigger}>hover me</span>
+      </TooltipPrimitive.Trigger>
+      <TooltipPrimitive.Portal>
+        <TooltipPrimitive.Content
+          offset={offset}
+          placement={placement}
+          className={style.tooltipContent}
+        >
+          <div className={style.tooltipText}>it is tooltip</div>
+          <TooltipPrimitive.Arrow asChild>
+            <ArrowDownFillIcon style={{ width: "10px", height: "10px" }} />
+          </TooltipPrimitive.Arrow>
+        </TooltipPrimitive.Content>
+      </TooltipPrimitive.Portal>
+    </TooltipPrimitive.Root>
+  );
+};
+
+export const HeadlessTooltip = ({
+  placement,
+  offset,
+  ...rootProps
+}: TooltipProps) => {
   return (
     <TooltipPrimitive.Root {...rootProps}>
       <TooltipPrimitive.Trigger asChild>
@@ -27,5 +57,3 @@ const Example = ({ placement, offset, ...rootProps }: TooltipProps) => {
     </TooltipPrimitive.Root>
   );
 };
-
-export default Example;

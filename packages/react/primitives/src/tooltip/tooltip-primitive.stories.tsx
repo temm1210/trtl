@@ -1,10 +1,10 @@
 import { Meta, StoryObj } from "@storybook/react";
 
-import Tooltip from "./example";
+import { HeadlessTooltip, StyledTooltip } from "./example";
 
-const meta: Meta<typeof Tooltip> = {
+const meta: Meta<typeof StyledTooltip> = {
   title: "Primitives/Tooltip",
-  component: Tooltip,
+  component: StyledTooltip,
   parameters: {
     layout: "centered",
   },
@@ -18,11 +18,11 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Base: StoryObj<Story> = {
-  render: (args) => <Tooltip {...args} />,
+  render: (args) => <StyledTooltip {...args} />,
 };
 
 export const DefaultOpen: StoryObj<Story> = {
-  render: () => <Tooltip defaultOpen />,
+  render: () => <StyledTooltip defaultOpen />,
 };
 
 export const DelayDuration: StoryObj<Story> = {
@@ -34,12 +34,16 @@ export const DelayDuration: StoryObj<Story> = {
   args: {
     delayDuration: 1000,
   },
-  render: (props) => <Tooltip {...props} />,
+  render: (props) => <StyledTooltip {...props} />,
 };
 
 export const Disabled: StoryObj<Story> = {
   args: {
     disabled: true,
   },
-  render: (props) => <Tooltip {...props} />,
+  render: (props) => <StyledTooltip {...props} />,
+};
+
+export const Headless: StoryObj<Story> = {
+  render: (args) => <HeadlessTooltip {...args} />,
 };

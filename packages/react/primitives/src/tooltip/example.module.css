@@ -1,4 +1,4 @@
-.tooltip-content {
+.tooltipContent {
   box-shadow:
     0 6px 16px 0 rgba(0, 0, 0, 0.08),
     0 3px 6px -4px rgba(0, 0, 0, 0.12),
@@ -10,7 +10,7 @@
   padding: 0.875rem;
   font-size: 0.875rem;
   border-radius: 0.25rem;
-  /* 
+
   transition:
     opacity 150ms ease-in-out,
     transform 150ms ease-in-out;
@@ -22,18 +22,18 @@
   &[data-exiting] {
     opacity: 0;
     transform: scale(0.7);
-  } */
-
+  }
+  /* 
   &[data-open] {
     animation: scaleIn 150ms ease-out;
   }
 
   &[data-close] {
     animation: scaleOut 150ms ease-in;
-  }
+  } */
 }
 
-.tooltip-trigger {
+.tooltipTrigger {
   cursor: pointer;
 }
 
