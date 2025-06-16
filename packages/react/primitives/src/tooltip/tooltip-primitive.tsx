@@ -48,8 +48,9 @@ const TooltipRoot = ({
 }: TooltipRootProps) => {
   const [isOpen, setIsOpen] = React.useState(defaultOpen ?? false);
   const [status, setStatus] = React.useState<Status>(
-    defaultOpen ? "mounted" : "unmounted",
+    isOpen ? "mounted" : "unmounted",
   );
+
   const [anchor, setAnchor] = React.useState<HTMLElement | null>(null);
 
   const timerRef = React.useRef(0);

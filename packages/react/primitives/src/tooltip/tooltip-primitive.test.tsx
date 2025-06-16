@@ -183,6 +183,8 @@ describe("Tooltip primitive tests", () => {
     const tooltip = getByRole("tooltip");
 
     expect(tooltip).toBeInTheDocument();
+    expect(tooltip).toHaveAttribute("data-open");
+    expect(tooltip).not.toHaveAttribute("data-entering");
   });
 
   test("portal forceMount", async () => {
@@ -200,5 +202,6 @@ describe("Tooltip primitive tests", () => {
     const tooltip = getByRole("tooltip");
 
     expect(tooltip).toBeInTheDocument();
+    expect(tooltip).toHaveAttribute("data-close");
   });
 });
