@@ -13,7 +13,6 @@ import {
 import { createContext, mergeRefs, Portal, Slot } from "@rtl/react-utils";
 
 type Status = "mounted" | "unmounted" | "entering" | "exiting";
-
 interface TooltipContextValue {
   status: Status;
   anchor: HTMLElement | null;
@@ -65,12 +64,6 @@ const TooltipRoot = ({
       setIsOpen(true);
       setStatus("entering");
       onOpenChangeProp?.(true);
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setStatus("mounted");
-        });
-      });
     }, delayDuration);
   }, [delayDuration, onOpenChangeProp]);
 
@@ -80,7 +73,7 @@ const TooltipRoot = ({
     onOpenChangeProp?.(false);
   }, [onOpenChangeProp]);
 
-  const handleDelayedExiting = React.useCallback(() => {
+  const handleExiting = React.useCallback(() => {
     window.clearTimeout(timerRef.current);
 
     timerRef.current = window.setTimeout(() => {
@@ -97,6 +90,16 @@ const TooltipRoot = ({
       "data-close":
         status === "unmounted" || status === "exiting" ? "" : undefined,
     };
+  }, [status]);
+
+  React.useEffect(() => {
+    if (status === "entering") {
+      const frameId = requestAnimationFrame(() => {
+        setStatus("mounted");
+      });
+
+      return () => cancelAnimationFrame(frameId);
+    }
   }, [status]);
 
   React.useEffect(() => {
@@ -117,7 +120,7 @@ const TooltipRoot = ({
         dataAttribute,
         openTooltip: handleOpenTooltip,
         closeTooltip: handleCloseTooltip,
-        startExitingTooltip: handleDelayedExiting,
+        startExitingTooltip: handleExiting,
         open,
       }}
     >
@@ -308,7 +311,7 @@ const TooltipContent = ({
         placement,
       }}
     >
-      <SafeAreaOverlay points={safePolygon} />
+      {false && <SafeAreaOverlay points={safePolygon} />}
       <Comp
         role="tooltip"
         ref={mergeRefs([refProp, refs.setFloating])}
