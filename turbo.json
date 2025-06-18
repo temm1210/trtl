@@ -1,7 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalEnv": ["CI"],
+  "globalEnv": ["CI", "STORYBOOK", "VITEST"],
   "tasks": {
     "build": {
       "dependsOn": ["^build", "^lint", "^check-types"],

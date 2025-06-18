@@ -21,7 +21,7 @@ interface TooltipContextValue {
   dataAttribute: Record<string, any>;
   openTooltip: () => void;
   closeTooltip: () => void;
-  startExitingTooltip: () => void;
+  exitTooltip: () => void;
 }
 
 const [TooltipPrimitiveProvider, useTooltipPrimitiveContext] =
@@ -73,7 +73,7 @@ const TooltipRoot = ({
     onOpenChangeProp?.(false);
   }, [onOpenChangeProp]);
 
-  const handleExiting = React.useCallback(() => {
+  const handleExitTooltip = React.useCallback(() => {
     window.clearTimeout(timerRef.current);
 
     timerRef.current = window.setTimeout(() => {
@@ -94,11 +94,11 @@ const TooltipRoot = ({
 
   React.useEffect(() => {
     if (status === "entering") {
-      const frameId = requestAnimationFrame(() => {
+      const timerId = setTimeout(() => {
         setStatus("mounted");
       });
 
-      return () => cancelAnimationFrame(frameId);
+      return () => clearTimeout(timerId);
     }
   }, [status]);
 
@@ -120,7 +120,7 @@ const TooltipRoot = ({
         dataAttribute,
         openTooltip: handleOpenTooltip,
         closeTooltip: handleCloseTooltip,
-        startExitingTooltip: handleExiting,
+        exitTooltip: handleExitTooltip,
         open,
       }}
     >
@@ -212,14 +212,8 @@ const TooltipContent = ({
 }: TooltipContentProps) => {
   const Comp = asChild ? Slot : "div";
 
-  const {
-    anchor,
-    open,
-    status,
-    dataAttribute,
-    startExitingTooltip,
-    closeTooltip,
-  } = useTooltipPrimitiveContext();
+  const { anchor, open, status, dataAttribute, exitTooltip, closeTooltip } =
+    useTooltipPrimitiveContext();
   const [safePolygon, setSafePolygon] = React.useState<Point[] | null>(null);
   const [arrowELement, setArrowElement] = React.useState<HTMLElement | null>(
     null,
@@ -272,15 +266,14 @@ const TooltipContent = ({
       if (isPointInPolygon({ x: ev.clientX, y: ev.clientY }, safePolygon)) {
         return;
       }
-
-      startExitingTooltip();
+      exitTooltip();
     };
 
     document.addEventListener("pointermove", handlePointerMove, {
       passive: true,
     });
     return () => document.removeEventListener("pointermove", handlePointerMove);
-  }, [startExitingTooltip, safePolygon]);
+  }, [exitTooltip, safePolygon]);
 
   React.useEffect(() => {
     if (!anchor || !contentElement) return;
@@ -301,6 +294,8 @@ const TooltipContent = ({
     };
   }, [anchor, contentElement, placement]);
 
+  const isTest = import.meta.env.VITEST;
+
   return (
     <TooltipPrimitiveContentProvider
       value={{
@@ -311,7 +306,7 @@ const TooltipContent = ({
         placement,
       }}
     >
-      {false && <SafeAreaOverlay points={safePolygon} />}
+      {isTest && <SafeAreaOverlay points={safePolygon} />}
       <Comp
         role="tooltip"
         ref={mergeRefs([refProp, refs.setFloating])}
