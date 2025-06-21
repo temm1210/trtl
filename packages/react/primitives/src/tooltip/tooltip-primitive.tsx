@@ -294,6 +294,7 @@ const TooltipContent = ({
     };
   }, [anchor, contentElement, placement]);
 
+  // for test (ex. visual regression)
   const isTest = typeof window !== "undefined" && (window as any).__TEST__;
 
   return (
