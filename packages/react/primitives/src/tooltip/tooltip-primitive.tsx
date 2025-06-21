@@ -294,7 +294,7 @@ const TooltipContent = ({
     };
   }, [anchor, contentElement, placement]);
 
-  const isTest = import.meta.env.VITEST;
+  const isTest = typeof window !== "undefined" && (window as any).__TEST__;
 
   return (
     <TooltipPrimitiveContentProvider
