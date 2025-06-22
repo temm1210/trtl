@@ -4,6 +4,8 @@ const STORYBOOK_URL = "http://localhost:6006";
 
 export default defineConfig({
   testDir: "./playwright/tests",
+  snapshotPathTemplate:
+    "{testDir}/{testFileDir}/__snapshots__/{arg}-{projectName}{ext}",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,

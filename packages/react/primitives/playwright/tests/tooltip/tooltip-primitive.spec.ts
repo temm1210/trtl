@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { getStoryUrl } from "../getStoryUrl";
+import { getStoryUrl } from "../../getStoryUrl";
 
 test.describe("safe polygon", () => {
   for (const placement of ["top", "bottom", "left", "right"]) {
@@ -11,8 +11,6 @@ test.describe("safe polygon", () => {
         (window as any).__TEST__ = true;
       });
       await page.goto(getStoryUrl("tooltip--headless", { placement }));
-
-      await page.evaluate;
 
       const trigger = page.locator(".tooltip-trigger");
       const tooltipContent = page.locator(".tooltip-content");
@@ -41,6 +39,13 @@ test.describe("safe polygon", () => {
 
       await page.mouse.move(contentCenterX, contentCenterY, { steps: 50 });
       await expect(tooltipContent).toBeVisible();
+
+      await expect(page).toHaveScreenshot(
+        `tooltip-safe-polygon-${placement}.png`,
+      );
+
+      await page.mouse.move(0, 0, { steps: 10 });
+      await expect(tooltipContent).not.toBeVisible();
     });
   }
 });
