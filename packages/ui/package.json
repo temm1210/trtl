@@ -11,7 +11,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "lint": "eslint --fix",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "chromatic": "npx chromatic --project-token=chpt_e43c48688ac939e"
   },
   "dependencies": {
     "@rtl/icons": "workspace:*",

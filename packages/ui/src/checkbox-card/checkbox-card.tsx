@@ -8,7 +8,12 @@ export interface CheckboxCardProps extends CheckboxRootProps {
   description: string;
 }
 
-const CheckboxCard = ({ icon, title, description, ...restProps }: CheckboxCardProps) => {
+const CheckboxCard = ({
+  icon,
+  title,
+  description,
+  ...restProps
+}: CheckboxCardProps) => {
   return (
     <CheckboxPrimitive.Root css={rootCss} {...restProps}>
       <div css={wrapperCss}>

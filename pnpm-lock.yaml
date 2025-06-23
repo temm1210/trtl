@@ -87,6 +87,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^3.1.1
         version: 3.1.1(vitest@3.2.3(@types/node@22.10.2)(jsdom@26.0.0))
+      chromatic:
+        specifier: ^13.0.1
+        version: 13.0.1
       eslint:
         specifier: ^8
         version: 8.57.1
@@ -1947,6 +1950,18 @@ packages:
 
   chromatic@11.27.0:
     resolution: {integrity: sha512-jQ2ufjS+ePpg+NtcPI9B2eOi+pAzlRd2nhd1LgNMsVCC9Bzf5t8mJtyd8v2AUuJS0LdX0QVBgkOnlNv9xviHzA==}
+    hasBin: true
+    peerDependencies:
+      '@chromatic-com/cypress': ^0.*.* || ^1.0.0
+      '@chromatic-com/playwright': ^0.*.* || ^1.0.0
+    peerDependenciesMeta:
+      '@chromatic-com/cypress':
+        optional: true
+      '@chromatic-com/playwright':
+        optional: true
+
+  chromatic@13.0.1:
+    resolution: {integrity: sha512-vX0Rs/pAeFAnGuQiVrA4h0XD36MYbTUp9Mlm1jFqXo3Cejd2BdBY1CA+vd6CkeO5CRSc6TRWmCz0zQAsE1q3Hw==}
     hasBin: true
     peerDependencies:
       '@chromatic-com/cypress': ^0.*.* || ^1.0.0
@@ -6478,6 +6493,8 @@ snapshots:
   check-error@2.1.1: {}
 
   chromatic@11.27.0: {}
+
+  chromatic@13.0.1: {}
 
   ci-info@3.9.0: {}
 
