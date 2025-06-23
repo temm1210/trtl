@@ -45,7 +45,7 @@ test.describe("safe polygon", () => {
       const safePolygonPoints = await polygon.getAttribute("points");
 
       await expect(safePolygonPoints).toMatchSnapshot(
-        "safe-polygon-points.snap",
+        `safe-polygon-points-${placement}.snap`,
       );
 
       await page.mouse.move(0, 0, { steps: 10 });
