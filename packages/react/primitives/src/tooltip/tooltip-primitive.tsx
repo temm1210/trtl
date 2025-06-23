@@ -449,10 +449,10 @@ function calculateSafePolygon(
         { x: content.right, y: content.top },
         { x: content.right, y: anchor.top },
         { x: anchor.right, y: anchor.top },
-        // { x: anchor.right, y: anchor.bottom },
-        // { x: anchor.left, y: anchor.bottom },
-        // { x: anchor.left, y: anchor.top },
-        // { x: content.left, y: anchor.top },
+        { x: anchor.right, y: anchor.bottom },
+        { x: anchor.left, y: anchor.bottom },
+        { x: anchor.left, y: anchor.top },
+        { x: content.left, y: anchor.top },
       ];
 
     case "right":
