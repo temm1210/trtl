@@ -294,7 +294,7 @@ const TooltipContent = ({
     };
   }, [anchor, contentElement, placement]);
 
-  // for test (ex. visual regression)
+  // for test and dev
   const isTest = typeof window !== "undefined" && (window as any).__TEST__;
 
   return (
@@ -383,6 +383,7 @@ const SafeAreaOverlay: React.FC<{
 
   return points ? (
     <svg
+      data-testid="safe-area-overlay"
       style={{
         position: "fixed",
         width: "100vw",
@@ -448,7 +449,7 @@ function calculateSafePolygon(
         { x: anchor.right, y: anchor.bottom },
         { x: anchor.left, y: anchor.bottom },
         { x: anchor.left, y: anchor.top },
-        // { x: content.left, y: anchor.top },
+        { x: content.left, y: anchor.top },
       ];
 
     case "right":

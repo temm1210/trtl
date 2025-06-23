@@ -40,8 +40,12 @@ test.describe("safe polygon", () => {
       await page.mouse.move(contentCenterX, contentCenterY, { steps: 50 });
       await expect(tooltipContent).toBeVisible();
 
-      await expect(page).toHaveScreenshot(
-        `tooltip-safe-polygon-${placement}.png`,
+      const polygon = page.locator('[data-testid="safe-area-overlay"] polygon');
+
+      const safePolygonPoints = await polygon.getAttribute("points");
+
+      await expect(safePolygonPoints).toMatchSnapshot(
+        "safe-polygon-points.snap",
       );
 
       await page.mouse.move(0, 0, { steps: 10 });
