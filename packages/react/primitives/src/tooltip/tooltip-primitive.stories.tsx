@@ -8,13 +8,20 @@ const meta: Meta<typeof Tooltip> = {
   parameters: {
     layout: "centered",
   },
-  tags: ["autodocs"],
+  argTypes: {
+    children: { control: false },
+  },
 };
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+export type TooltipStoryArgs = NonNullable<Story["args"]>;
+
 export const Base: StoryObj<Story> = {
+  args: {
+    showSafeArea: false,
+  },
   render: (args) => <Tooltip {...args} />,
 };
 
@@ -23,11 +30,6 @@ export const DefaultOpen: StoryObj<Story> = {
 };
 
 export const DelayDuration: StoryObj<Story> = {
-  argTypes: {
-    delayDuration: {
-      control: "number",
-    },
-  },
   args: {
     delayDuration: 1000,
   },
@@ -39,4 +41,8 @@ export const Disabled: StoryObj<Story> = {
     disabled: true,
   },
   render: (props) => <Tooltip {...props} />,
+};
+
+export const Headless: StoryObj<Story> = {
+  render: (args) => <Tooltip {...args} />,
 };

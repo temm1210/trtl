@@ -8,9 +8,9 @@ module.exports = {
   extends: [
     "eslint:recommended",
     "plugin:import/recommended",
-    "prettier",
     "turbo",
     "plugin:react-hooks/recommended-legacy",
+    "prettier",
   ],
   globals: {
     React: true,

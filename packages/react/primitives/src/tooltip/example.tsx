@@ -1,18 +1,29 @@
 import { ArrowDownFillIcon } from "@rtl/icons";
 
-import { TooltipPrimitive, TooltipRootProps } from "./";
-
+import { TooltipContentProps, TooltipPrimitive, TooltipRootProps } from "./";
 import "./example.css";
 
-const Example = (props: TooltipRootProps) => {
+export interface TooltipProps extends TooltipRootProps, TooltipContentProps {}
+
+const Tooltip = ({
+  placement,
+  offset,
+  showSafeArea,
+  ...rootProps
+}: TooltipProps) => {
   return (
-    <TooltipPrimitive.Root {...props}>
+    <TooltipPrimitive.Root {...rootProps}>
       <TooltipPrimitive.Trigger asChild>
         <span className="tooltip-trigger">hover me</span>
       </TooltipPrimitive.Trigger>
       <TooltipPrimitive.Portal>
-        <TooltipPrimitive.Content className="tooltip-content">
-          <div className="tooltip-text">it is tooltip</div>
+        <TooltipPrimitive.Content
+          offset={offset}
+          placement={placement}
+          showSafeArea={showSafeArea}
+          className="tooltip-content"
+        >
+          <div>it is tooltip</div>
           <TooltipPrimitive.Arrow asChild>
             <ArrowDownFillIcon style={{ width: "10px", height: "10px" }} />
           </TooltipPrimitive.Arrow>
@@ -22,5 +33,4 @@ const Example = (props: TooltipRootProps) => {
   );
 };
 
-export type { TooltipRootProps };
-export default Example;
+export default Tooltip;

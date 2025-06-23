@@ -13,15 +13,15 @@ import {
 import { createContext, mergeRefs, Portal, Slot } from "@rtl/react-utils";
 
 type Status = "mounted" | "unmounted" | "entering" | "exiting";
-
 interface TooltipContextValue {
   status: Status;
   anchor: HTMLElement | null;
   setAnchor: (anchor: HTMLElement | null) => void;
   open: boolean;
+  dataAttribute: Record<string, any>;
   openTooltip: () => void;
   closeTooltip: () => void;
-  startExitingTooltip: () => void;
+  exitTooltip: () => void;
 }
 
 const [TooltipPrimitiveProvider, useTooltipPrimitiveContext] =
@@ -46,8 +46,12 @@ const TooltipRoot = ({
   defaultOpen,
 }: TooltipRootProps) => {
   const [isOpen, setIsOpen] = React.useState(defaultOpen ?? false);
-  const [status, setStatus] = React.useState<Status>("unmounted");
+  const [status, setStatus] = React.useState<Status>(
+    isOpen ? "mounted" : "unmounted",
+  );
+
   const [anchor, setAnchor] = React.useState<HTMLElement | null>(null);
+
   const timerRef = React.useRef(0);
 
   const isControlled = openProp !== undefined;
@@ -60,12 +64,6 @@ const TooltipRoot = ({
       setIsOpen(true);
       setStatus("entering");
       onOpenChangeProp?.(true);
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setStatus("mounted");
-        });
-      });
     }, delayDuration);
   }, [delayDuration, onOpenChangeProp]);
 
@@ -75,13 +73,34 @@ const TooltipRoot = ({
     onOpenChangeProp?.(false);
   }, [onOpenChangeProp]);
 
-  const handleDelayedExiting = React.useCallback(() => {
+  const handleExitTooltip = React.useCallback(() => {
     window.clearTimeout(timerRef.current);
 
     timerRef.current = window.setTimeout(() => {
       setStatus("exiting");
     }, delayDuration);
   }, [delayDuration]);
+
+  const dataAttribute = React.useMemo(() => {
+    return {
+      "data-entering": status === "entering" ? "" : undefined,
+      "data-exiting": status === "exiting" ? "" : undefined,
+      "data-open":
+        status === "entering" || status === "mounted" ? "" : undefined,
+      "data-close":
+        status === "unmounted" || status === "exiting" ? "" : undefined,
+    };
+  }, [status]);
+
+  React.useEffect(() => {
+    if (status === "entering") {
+      const timerId = setTimeout(() => {
+        setStatus("mounted");
+      });
+
+      return () => clearTimeout(timerId);
+    }
+  }, [status]);
 
   React.useEffect(() => {
     return () => {
@@ -98,9 +117,10 @@ const TooltipRoot = ({
         anchor,
         setAnchor,
         status,
+        dataAttribute,
         openTooltip: handleOpenTooltip,
         closeTooltip: handleCloseTooltip,
-        startExitingTooltip: handleDelayedExiting,
+        exitTooltip: handleExitTooltip,
         open,
       }}
     >
@@ -122,10 +142,16 @@ const TooltipTrigger = ({
 }: TooltipTriggerProps) => {
   const Comp = asChild ? Slot : "button";
 
-  const { setAnchor, openTooltip } = useTooltipPrimitiveContext();
+  const { setAnchor, openTooltip, dataAttribute } =
+    useTooltipPrimitiveContext();
 
   return (
-    <Comp ref={setAnchor} onPointerEnter={openTooltip} {...restProps}>
+    <Comp
+      ref={setAnchor}
+      onPointerEnter={openTooltip}
+      {...dataAttribute}
+      {...restProps}
+    >
       {children}
     </Comp>
   );
@@ -168,6 +194,11 @@ export interface TooltipContentProps
   asChild?: boolean;
   placement?: Placement;
   offset?: number;
+  /**
+   * @internal
+   * This prop is for internal debugging purposes only.
+   */
+  showSafeArea?: boolean;
 }
 
 interface Point {
@@ -182,11 +213,12 @@ const TooltipContent = ({
   ref: refProp,
   asChild = false,
   placement = "top",
+  showSafeArea = false,
   ...restProps
 }: TooltipContentProps) => {
   const Comp = asChild ? Slot : "div";
 
-  const { anchor, open, status, startExitingTooltip, closeTooltip } =
+  const { anchor, open, status, dataAttribute, exitTooltip, closeTooltip } =
     useTooltipPrimitiveContext();
   const [safePolygon, setSafePolygon] = React.useState<Point[] | null>(null);
   const [arrowELement, setArrowElement] = React.useState<HTMLElement | null>(
@@ -240,15 +272,14 @@ const TooltipContent = ({
       if (isPointInPolygon({ x: ev.clientX, y: ev.clientY }, safePolygon)) {
         return;
       }
-
-      startExitingTooltip();
+      exitTooltip();
     };
 
     document.addEventListener("pointermove", handlePointerMove, {
       passive: true,
     });
     return () => document.removeEventListener("pointermove", handlePointerMove);
-  }, [startExitingTooltip, safePolygon]);
+  }, [exitTooltip, safePolygon]);
 
   React.useEffect(() => {
     if (!anchor || !contentElement) return;
@@ -279,16 +310,12 @@ const TooltipContent = ({
         placement,
       }}
     >
-      <SafeAreaOverlay points={safePolygon} />
+      {showSafeArea && <SafeAreaOverlay points={safePolygon} />}
       <Comp
         role="tooltip"
         ref={mergeRefs([refProp, refs.setFloating])}
         style={{ ...floatingStyles, ...style }}
-        data-status={status}
-        data-open={open && status !== "unmounted" ? "" : undefined}
-        data-closed={
-          status === "unmounted" || status === "exiting" ? "" : undefined
-        }
+        {...dataAttribute}
         {...restProps}
       >
         {children}
@@ -359,6 +386,7 @@ const SafeAreaOverlay: React.FC<{
 
   return points ? (
     <svg
+      data-testid="safe-area-overlay"
       style={{
         position: "fixed",
         width: "100vw",

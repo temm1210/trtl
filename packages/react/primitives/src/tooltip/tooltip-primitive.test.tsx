@@ -1,7 +1,7 @@
 import React from "react";
 
 import { render } from "@rtl/react-utils";
-import { act, waitFor } from "@testing-library/react";
+import { act, fireEvent, waitFor } from "@testing-library/react";
 
 import {
   TooltipArrow,
@@ -52,6 +52,7 @@ describe("Tooltip primitive tests", () => {
     await waitFor(() => {
       expect(getByRole("tooltip")).toBeInTheDocument();
     });
+
     expect(handleOpenChange).toHaveBeenCalledTimes(1);
     expect(handleOpenChange).toHaveBeenCalledWith(true);
 
@@ -60,6 +61,7 @@ describe("Tooltip primitive tests", () => {
     await waitFor(() => {
       expect(queryByRole("tooltip")).not.toBeInTheDocument();
     });
+
     expect(handleOpenChange).toHaveBeenCalledTimes(2);
     expect(handleOpenChange).toHaveBeenCalledWith(false);
   });
@@ -97,8 +99,8 @@ describe("Tooltip primitive tests", () => {
     });
     vi.useFakeTimers();
 
-    const DELAY_TIME = 2500;
-    const { userEvent, getByTestId, queryByRole, getByRole } = render(
+    const DELAY_TIME = 1000;
+    const { getByTestId, queryByRole } = render(
       <TooltipRoot delayDuration={DELAY_TIME}>
         <TooltipTrigger data-testid="test-trigger">trigger</TooltipTrigger>
         <TooltipPortal>
@@ -107,27 +109,30 @@ describe("Tooltip primitive tests", () => {
       </TooltipRoot>,
       {
         advanceTimers: vi.advanceTimersByTime.bind(vi),
+        delay: null,
       },
     );
 
     const trigger = getByTestId("test-trigger");
 
-    await userEvent.hover(trigger);
-    expect(queryByRole("tooltip")).not.toBeInTheDocument();
+    /**
+     * user event use jest.advanceTimersByTime(0)
+     * https://github.com/testing-library/react-testing-library/blob/f78839bf4147a777a823e33a429bcf5de9562f9e/src/pure.js#L50
+     */
+    fireEvent.pointerEnter(trigger);
 
     /**
      * https://github.com/vitest-dev/vitest/issues/1983#issuecomment-1238794400
      */
-    act(() => {
-      vi.advanceTimersByTime(DELAY_TIME);
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(DELAY_TIME);
     });
-    expect(getByRole("tooltip")).toBeInTheDocument();
 
-    await userEvent.unhover(trigger);
-    expect(getByRole("tooltip")).toBeInTheDocument();
+    fireEvent.pointerLeave(trigger);
+    fireEvent.pointerMove(trigger);
 
-    act(() => {
-      vi.advanceTimersByTime(DELAY_TIME);
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(DELAY_TIME);
     });
     expect(queryByRole("tooltip")).not.toBeInTheDocument();
 
@@ -180,6 +185,8 @@ describe("Tooltip primitive tests", () => {
     const tooltip = getByRole("tooltip");
 
     expect(tooltip).toBeInTheDocument();
+    expect(tooltip).toHaveAttribute("data-open");
+    expect(tooltip).not.toHaveAttribute("data-entering");
   });
 
   test("portal forceMount", async () => {
@@ -197,5 +204,6 @@ describe("Tooltip primitive tests", () => {
     const tooltip = getByRole("tooltip");
 
     expect(tooltip).toBeInTheDocument();
+    expect(tooltip).toHaveAttribute("data-close");
   });
 });

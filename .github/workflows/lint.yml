@@ -1,0 +1,23 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-types:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Project
+        uses: ./.github/actions/setup
+
+      - name: Run Lint
+        run: pnpm turbo run lint
+
+      - name: Run Typecheck
+        run: pnpm turbo run check-types
