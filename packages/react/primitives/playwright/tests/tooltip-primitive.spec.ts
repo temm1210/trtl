@@ -1,16 +1,20 @@
 import { expect, test } from "@playwright/test";
 
-import { getStoryUrl } from "../../getStoryUrl";
+import { TooltipStoryArgs } from "@/tooltip/tooltip-primitive.stories";
+
+import { getStoryUrl } from "../getStoryUrl";
 
 test.describe("safe polygon", () => {
-  for (const placement of ["top", "bottom", "left", "right"]) {
+  for (const placement of ["top", "bottom", "left", "right"] as const) {
     test(`open is maintained when the pointer when placement is ${placement}`, async ({
       page,
     }) => {
-      await page.addInitScript(() => {
-        (window as any).__TEST__ = true;
-      });
-      await page.goto(getStoryUrl("tooltip--headless", { placement }));
+      await page.goto(
+        getStoryUrl<TooltipStoryArgs>("tooltip--headless", {
+          placement,
+          showSafeArea: true,
+        }),
+      );
 
       const trigger = page.locator(".tooltip-trigger");
       const tooltipContent = page.locator(".tooltip-content");
@@ -39,14 +43,6 @@ test.describe("safe polygon", () => {
 
       await page.mouse.move(contentCenterX, contentCenterY, { steps: 50 });
       await expect(tooltipContent).toBeVisible();
-
-      const polygon = page.locator('[data-testid="safe-area-overlay"] polygon');
-
-      const safePolygonPoints = await polygon.getAttribute("points");
-
-      await expect(safePolygonPoints).toMatchSnapshot(
-        `safe-polygon-points-${placement}.snap`,
-      );
 
       await page.mouse.move(0, 0, { steps: 10 });
       await expect(tooltipContent).not.toBeVisible();

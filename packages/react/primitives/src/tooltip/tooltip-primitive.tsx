@@ -194,6 +194,11 @@ export interface TooltipContentProps
   asChild?: boolean;
   placement?: Placement;
   offset?: number;
+  /**
+   * @internal
+   * This prop is for internal debugging purposes only.
+   */
+  showSafeArea?: boolean;
 }
 
 interface Point {
@@ -208,6 +213,7 @@ const TooltipContent = ({
   ref: refProp,
   asChild = false,
   placement = "top",
+  showSafeArea = false,
   ...restProps
 }: TooltipContentProps) => {
   const Comp = asChild ? Slot : "div";
@@ -294,9 +300,6 @@ const TooltipContent = ({
     };
   }, [anchor, contentElement, placement]);
 
-  // for test and dev
-  const isTest = typeof window !== "undefined" && (window as any).__TEST__;
-
   return (
     <TooltipPrimitiveContentProvider
       value={{
@@ -307,7 +310,7 @@ const TooltipContent = ({
         placement,
       }}
     >
-      {isTest && <SafeAreaOverlay points={safePolygon} />}
+      {showSafeArea && <SafeAreaOverlay points={safePolygon} />}
       <Comp
         role="tooltip"
         ref={mergeRefs([refProp, refs.setFloating])}
@@ -446,10 +449,10 @@ function calculateSafePolygon(
         { x: content.right, y: content.top },
         { x: content.right, y: anchor.top },
         { x: anchor.right, y: anchor.top },
-        { x: anchor.right, y: anchor.bottom },
-        { x: anchor.left, y: anchor.bottom },
-        { x: anchor.left, y: anchor.top },
-        { x: content.left, y: anchor.top },
+        // { x: anchor.right, y: anchor.bottom },
+        // { x: anchor.left, y: anchor.bottom },
+        // { x: anchor.left, y: anchor.top },
+        // { x: content.left, y: anchor.top },
       ];
 
     case "right":

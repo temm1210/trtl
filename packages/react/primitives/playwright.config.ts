@@ -14,7 +14,7 @@ export default defineConfig({
   use: {
     baseURL: `${STORYBOOK_URL}/iframe.html`,
     trace: "on-first-retry",
-    viewport: { width: 1280, height: 720 },
+    viewport: { width: 1024, height: 768 },
   },
   webServer: {
     command: "pnpm run storybook",
