@@ -8,7 +8,7 @@
     "check-types": "turbo run check-types",
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
-    "build-storybook": "turbo run build-storybook",
+    "build-storybook:ui": "turbo run build-storybook --filter=./packages/ui",
     "prepare": "husky"
   },
   "dependencies": {
