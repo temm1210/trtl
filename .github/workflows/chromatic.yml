@@ -22,7 +22,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Build Storybook for ${{ matrix.name }}
-        run: turbo run build-storybook --filter="./${{ matrix.path }}"
+        run: pnpm run build-storybook -- --filter="./${{ matrix.path }}"
 
       - name: Run Chromatic
         uses: chromaui/action@v1
