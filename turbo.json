@@ -8,6 +8,11 @@
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
+    "build-storybook": {
+      "dependsOn": ["^build"],
+      "outputs": ["storybook-static/**"],
+      "cache": true
+    },
     "lint": {},
     "check-types": {
       "dependsOn": ["^check-types"]

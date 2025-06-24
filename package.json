@@ -8,6 +8,7 @@
     "check-types": "turbo run check-types",
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
+    "build-storybook:ui": "turbo run build-storybook --filter=./packages/ui",
     "prepare": "husky"
   },
   "dependencies": {
@@ -39,6 +40,7 @@
     "@vercel/style-guide": "^5.2.0",
     "@vitejs/plugin-react": "^4.3.2",
     "@vitest/coverage-v8": "^3.1.1",
+    "chromatic": "^13.0.1",
     "eslint": "^8",
     "eslint-config-next": "^15.0.3",
     "eslint-config-prettier": "^9.1.0",

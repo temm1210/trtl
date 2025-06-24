@@ -9,9 +9,10 @@
     "test:watch": "vitest watch",
     "coverage": "vitest run --coverage",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
+    "build-storybook": "storybook build -o storybook-static",
     "lint": "eslint --fix",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "chromatic": "npx chromatic"
   },
   "dependencies": {
     "@rtl/icons": "workspace:*",
