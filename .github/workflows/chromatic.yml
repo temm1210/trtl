@@ -6,8 +6,14 @@ on:
   pull_request:
 
 jobs:
-  lint-and-types:
+  chromatic:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: ui
+            path: packages/ui
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -15,10 +21,14 @@ jobs:
       - name: Setup Project
         uses: ./.github/actions/setup
 
+      - name: Build Storybook for ${{ matrix.name }}
+        run: turbo run build-storybook --filter="./${{ matrix.path }}"
+
       - name: Run Chromatic
         uses: chromaui/action@v1
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          storybookBuildDir: ${{ matrix.path }}/storybook-static
           onlyChanged: true
           autoAcceptChanges: "main"
           exitOnceUploaded: true
