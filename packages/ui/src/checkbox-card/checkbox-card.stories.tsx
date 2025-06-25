@@ -1,5 +1,5 @@
 import { ReactIcon } from "@rtl/icons";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import CheckboxCard from "./checkbox-card";
 

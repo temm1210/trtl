@@ -72,8 +72,8 @@ const contentCss = css`
   opacity: 1;
   transform: scale(1);
 
-  &[data-status="entering"],
-  &[data-status="exiting"] {
+  &[data-entering],
+  &[data-exiting] {
     opacity: 0;
     transform: scale(0.7);
   }

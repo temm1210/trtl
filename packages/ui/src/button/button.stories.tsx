@@ -1,6 +1,6 @@
 import { ArrowUpOutlineIcon, DownloadSolidIcon } from "@rtl/icons";
-import type { Meta, StoryObj } from "@storybook/react";
-import { fn } from "@storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import Button from "./button";
 
@@ -88,7 +88,13 @@ export const Loading: Story = {
         <Button buttonType="primary" size="medium" loading {...args}>
           Primary
         </Button>
-        <Button buttonType="secondary" size="medium" loading loadingPlacement="right" {...args}>
+        <Button
+          buttonType="secondary"
+          size="medium"
+          loading
+          loadingPlacement="right"
+          {...args}
+        >
           Secondary
         </Button>
         <Button buttonType="danger" size="medium" loading {...args}>
@@ -103,10 +109,20 @@ export const WithIcon: Story = {
   render: (args) => {
     return (
       <>
-        <Button buttonType="primary" size="small" leftIcon={<DownloadSolidIcon />} {...args}>
+        <Button
+          buttonType="primary"
+          size="small"
+          leftIcon={<DownloadSolidIcon />}
+          {...args}
+        >
           Primary
         </Button>
-        <Button buttonType="secondary" size="medium" rightIcon={<DownloadSolidIcon />} {...args}>
+        <Button
+          buttonType="secondary"
+          size="medium"
+          rightIcon={<DownloadSolidIcon />}
+          {...args}
+        >
           Secondary
         </Button>
         <Button
