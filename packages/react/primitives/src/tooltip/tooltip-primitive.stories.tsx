@@ -20,7 +20,7 @@ export type TooltipStoryArgs = NonNullable<Story["args"]>;
 
 export const Base: StoryObj<Story> = {
   args: {
-    showSafeArea: false,
+    showSafeArea: true,
   },
   render: (args) => <Tooltip {...args} />,
 };
