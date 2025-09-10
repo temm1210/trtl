@@ -71,4 +71,6 @@ return (
 
 ## Safe polygon
 
+When the mouse hovers over the yellow box, the tooltip does not close
+
 ![내 앱 실행 화면](./safe-polygon.png)
