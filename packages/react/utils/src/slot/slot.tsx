@@ -118,9 +118,9 @@ function mergeProps(
   }
 
   if (slotProps.className) {
-    mergedProps.className = [slotProps.className, childProps.className].join(
-      " ",
-    );
+    mergedProps.className = [slotProps.className, childProps.className]
+      .join(" ")
+      .trim();
   }
 
   return mergedProps;

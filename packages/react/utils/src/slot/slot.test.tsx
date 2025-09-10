@@ -2,13 +2,6 @@ import { Slot, Slottable } from "@/slot";
 
 import { render } from "../test/utils";
 
-const serialize = (html: string) =>
-  html
-    .replace(/>\s+</g, "><")
-    .replace(/(?<=[>])\s+(?=[^<])/g, "")
-    .replace(/(?<=[^>])\s+(?=[<])/g, "")
-    .trim();
-
 describe("Slot tests", () => {
   test("render child correctly", async () => {
     const dom = render(
@@ -23,18 +16,8 @@ describe("Slot tests", () => {
       </div>,
     );
 
-    const result = `
-        <div class="container">
-          <div class="slot child" id="child">
-            <span>span</span>
-            <p>p</p>
-            <strong>strong</strong>
-          </div>
-        </div>
-    `;
-
     expect(dom.container.innerHTML).toMatchInlineSnapshot(
-      `"${serialize(result)}"`,
+      `"<div class="container"><div class="slot child" id="child"><span>span</span><p>p</p><strong>strong</strong></div></div>"`,
     );
   });
 
@@ -49,28 +32,20 @@ describe("Slot tests", () => {
         style={{ color: "red" }}
         onClick={handleSlotClick}
       >
-        <p
-          className="child"
-          style={{ backgroundColor: "red" }}
-          onClick={handleSlotChildClick}
-        >
+        <p style={{ backgroundColor: "red" }} onClick={handleSlotChildClick}>
           <span>span</span>
         </p>
       </Slot>,
     );
-
-    const result = `
-        <p class="slot child" style="color: red; background-color: red;" data-testid="slot-test-id">
-            <span>span</span>
-        </p>
-    `;
 
     expect(handleSlotClick).toHaveBeenCalledTimes(0);
     expect(handleSlotChildClick).toHaveBeenCalledTimes(0);
 
     await userEvent.click(getByTestId("slot-test-id"));
 
-    expect(container.innerHTML).toMatchInlineSnapshot(`"${serialize(result)}"`);
+    expect(container.innerHTML).toMatchInlineSnapshot(
+      `"<p style="color: red; background-color: red;" data-testid="slot-test-id" class="slot"><span>span</span></p>"`,
+    );
     expect(handleSlotClick).toHaveBeenCalledTimes(1);
     expect(handleSlotChildClick).toHaveBeenCalledTimes(1);
 
@@ -131,15 +106,9 @@ describe("Slot tests", () => {
       </Slot>,
     );
 
-    const result = `
-        <a class="slot slottable" style="color: black; background-color: red;">
-          <div>div1</div>
-          link
-          <div>div2</div>
-        </a>
-    `;
-
-    expect(container.innerHTML).toMatchInlineSnapshot(`"${serialize(result)}"`);
+    expect(container.innerHTML).toMatchInlineSnapshot(
+      `"<a class="slot slottable" style="color: black; background-color: red;"><div>div1</div>link<div>div2</div></a>"`,
+    );
   });
 
   test("throw error if slot has more than one Slottable", () => {
