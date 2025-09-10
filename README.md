@@ -6,8 +6,11 @@ common config
 
 ## primitives
 
-headless component
+- [Checkbox](./packages/react/primitives/src/checkbox/)
+- [Tooltip](./packages/react/primitives/src/tooltip/)
 
 ## ui
 
-design system
+- [Button](./packages/ui/src/button/)
+- [Checkbox](./packages/ui/src/checkbox/)
+- [Tooltip](./packages/ui/src/tooltip/)
