@@ -68,3 +68,7 @@ return (
   }
 }
 ```
+
+## Safe polygon
+
+![내 앱 실행 화면](./safe-polygon.png)
