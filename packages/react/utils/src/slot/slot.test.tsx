@@ -4,21 +4,21 @@ import { render } from "../test/utils";
 
 describe("Slot tests", () => {
   test("render child correctly", async () => {
-    const dom = render(
-      <div className="container">
-        <Slot className="slot" id="slot">
-          <div className="child" id="child">
-            <span>span</span>
-            <p>p</p>
-            <strong>strong</strong>
-          </div>
+    const Component = () => {
+      return (
+        <Slot>
+          <p>child</p>
         </Slot>
-      </div>,
-    );
+      );
+    };
 
-    expect(dom.container.innerHTML).toMatchInlineSnapshot(
-      `"<div class="container"><div class="slot child" id="child"><span>span</span><p>p</p><strong>strong</strong></div></div>"`,
-    );
+    const { container } = render(<Component />);
+
+    expect(container.firstChild).toMatchInlineSnapshot(`
+    <p>
+      child
+    </p>
+  `);
   });
 
   test("pass Slot props to its chid and merge it", async () => {
