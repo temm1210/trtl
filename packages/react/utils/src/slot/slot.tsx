@@ -1,13 +1,12 @@
 import React from "react";
 
-import { mergeRefs } from "../merge-refs";
+import mergeRefs from "@/merge-refs";
 
 export interface SlotProps extends React.HTMLAttributes<HTMLElement> {
   children: React.ReactNode;
   ref?: React.Ref<HTMLElement>;
 }
 
-/** A component that passes its props to its child and renders its child */
 const Slot = ({ children, ...slotProps }: SlotProps) => {
   const childrenAsArray = React.Children.toArray(children);
 
@@ -38,15 +37,9 @@ const Slot = ({ children, ...slotProps }: SlotProps) => {
     });
 
     return (
-      <SlotCloneElement {...slotProps}>
-        {React.isValidElement(slottableChildren)
-          ? React.cloneElement(
-              slottableChildren,
-              undefined,
-              nextSlottableChildren,
-            )
-          : null}
-      </SlotCloneElement>
+      <CloneElement nextChildren={nextSlottableChildren} {...slotProps}>
+        {slottableChildren}
+      </CloneElement>
     );
   }
 
@@ -54,43 +47,37 @@ const Slot = ({ children, ...slotProps }: SlotProps) => {
     throw Error("Slot must have exactly one child");
   }
 
-  return (
-    <SlotCloneElement {...slotProps}>
-      {childrenAsArray[0] as React.ReactElement<HTMLElement>}
-    </SlotCloneElement>
-  );
+  return <CloneElement {...slotProps}>{children}</CloneElement>;
 };
 
-// ****************** SlotCloneElement ***************************
-interface SlotCloneElementProps extends React.HTMLAttributes<HTMLElement> {
+// ****************** CloneElement ***************************
+interface CloneElementProp extends React.HTMLAttributes<HTMLElement> {
   children: React.ReactNode;
+  nextChildren?: React.ReactNode;
   ref?: React.Ref<HTMLElement>;
 }
 
-const SlotCloneElement = ({
+const CloneElement = ({
   children,
+  nextChildren,
   ...slotProps
-}: SlotCloneElementProps) => {
+}: CloneElementProp) => {
   if (!React.isValidElement(children)) {
-    return null;
+    throw Error("slot can only accept React elements");
   }
 
-  const child = React.Children.only(
-    children,
-  ) as React.ReactElement<HTMLElement>;
+  const props = mergeProps(slotProps, children.props as Record<string, any>);
 
-  const props = mergeProps(slotProps, child.props);
-
-  const childRef = (child.props as React.RefAttributes<any>).ref;
+  const childRef = (children.props as React.RefAttributes<any>).ref;
   const slotRef = slotProps.ref;
 
   if (childRef || slotRef) {
     props.ref = mergeRefs([childRef, slotRef]);
   }
 
-  return React.isValidElement(children)
-    ? React.cloneElement(children, props)
-    : null;
+  return nextChildren
+    ? React.cloneElement(children, props, nextChildren)
+    : React.cloneElement(children, props);
 };
 
 // ****************** Slottable ***************************
