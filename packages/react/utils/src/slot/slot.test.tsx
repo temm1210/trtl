@@ -52,23 +52,25 @@ describe("Slot tests", () => {
     expect(handleSlotChildClick).toReturnWith("slot child");
   });
 
-  test("should merge classNames when both slot and child have className", () => {
-    const Component = () => {
-      return (
-        <Slot className="slot-class">
-          <p data-testid="child-test" className="child-class">
-            child
-          </p>
-        </Slot>
+  describe("className prop merge", () => {
+    test("should merge className when both slot and child have className", () => {
+      const Component = () => {
+        return (
+          <Slot className="slot-class">
+            <p data-testid="child-test" className="child-class">
+              child
+            </p>
+          </Slot>
+        );
+      };
+
+      const { getByTestId } = render(<Component />);
+
+      expect(getByTestId("child-test")).toHaveAttribute(
+        "class",
+        "slot-class child-class",
       );
-    };
-
-    const { getByTestId } = render(<Component />);
-
-    expect(getByTestId("child-test")).toHaveAttribute(
-      "class",
-      "slot-class child-class",
-    );
+    });
   });
 
   test("merge Slot ref and child ref", () => {

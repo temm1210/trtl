@@ -1,6 +1,6 @@
 import React from "react";
 
-import mergeRefs from "@/merge-refs";
+import mergeRefs from "../merge-refs";
 
 export interface SlotProps extends React.HTMLAttributes<HTMLElement> {
   children: React.ReactNode;
