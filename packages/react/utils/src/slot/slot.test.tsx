@@ -28,7 +28,6 @@ describe("Slot tests", () => {
     const { container, userEvent, getByTestId } = render(
       <Slot
         data-testid="slot-test-id"
-        className="slot"
         style={{ color: "red" }}
         onClick={handleSlotClick}
       >
@@ -44,13 +43,32 @@ describe("Slot tests", () => {
     await userEvent.click(getByTestId("slot-test-id"));
 
     expect(container.innerHTML).toMatchInlineSnapshot(
-      `"<p style="color: red; background-color: red;" data-testid="slot-test-id" class="slot"><span>span</span></p>"`,
+      `"<p style="color: red; background-color: red;" data-testid="slot-test-id"><span>span</span></p>"`,
     );
     expect(handleSlotClick).toHaveBeenCalledTimes(1);
     expect(handleSlotChildClick).toHaveBeenCalledTimes(1);
 
     expect(handleSlotClick).toReturnWith("slot");
     expect(handleSlotChildClick).toReturnWith("slot child");
+  });
+
+  test("should merge classNames when both slot and child have className", () => {
+    const Component = () => {
+      return (
+        <Slot className="slot-class">
+          <p data-testid="child-test" className="child-class">
+            child
+          </p>
+        </Slot>
+      );
+    };
+
+    const { getByTestId } = render(<Component />);
+
+    expect(getByTestId("child-test")).toHaveAttribute(
+      "class",
+      "slot-class child-class",
+    );
   });
 
   test("merge Slot ref and child ref", () => {
