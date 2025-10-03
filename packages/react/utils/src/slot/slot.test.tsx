@@ -71,6 +71,38 @@ describe("Slot tests", () => {
         "slot-class child-class",
       );
     });
+
+    test("should merge correctly when child className is empty string", () => {
+      const Component = () => {
+        return (
+          <Slot className="slot-class">
+            <p data-testid="child-test" className="">
+              child
+            </p>
+          </Slot>
+        );
+      };
+
+      const { getByTestId } = render(<Component />);
+
+      expect(getByTestId("child-test")).toHaveAttribute("class", "slot-class");
+    });
+
+    test("should merge correctly when child className is undefined", () => {
+      const Component = () => {
+        return (
+          <Slot className="slot-class">
+            <p data-testid="child-test" className={undefined}>
+              child
+            </p>
+          </Slot>
+        );
+      };
+
+      const { getByTestId } = render(<Component />);
+
+      expect(getByTestId("child-test")).toHaveAttribute("class", "slot-class");
+    });
   });
 
   test("merge Slot ref and child ref", () => {
