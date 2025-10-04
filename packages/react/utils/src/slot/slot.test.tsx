@@ -103,6 +103,38 @@ describe("Slot tests", () => {
 
       expect(getByTestId("child-test")).toHaveAttribute("class", "slot-class");
     });
+
+    test("should merge correctly when slot className is empty string", () => {
+      const Component = () => {
+        return (
+          <Slot className="">
+            <p data-testid="child-test" className="child-class">
+              child
+            </p>
+          </Slot>
+        );
+      };
+
+      const { getByTestId } = render(<Component />);
+
+      expect(getByTestId("child-test")).toHaveAttribute("class", "child-class");
+    });
+
+    test("should merge correctly when slot className is undefined", () => {
+      const Component = () => {
+        return (
+          <Slot className={undefined}>
+            <p data-testid="child-test" className="child-class">
+              child
+            </p>
+          </Slot>
+        );
+      };
+
+      const { getByTestId } = render(<Component />);
+
+      expect(getByTestId("child-test")).toHaveAttribute("class", "child-class");
+    });
   });
 
   test("merge Slot ref and child ref", () => {
