@@ -24,7 +24,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Build Storybook for ${{ matrix.package }}
-        run: pnpm run build-storybook:${{ matrix.package }}
+        run: pnpm run build-storybook:${{ matrix.package }} --webpack-stats-json
 
       - name: Run Chromatic
         uses: chromaui/action@latest
