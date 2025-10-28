@@ -9,7 +9,7 @@
     "test:watch": "vitest watch",
     "coverage": "vitest run --coverage",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
+    "build-storybook": "storybook build -o storybook-static --stats-json",
     "lint": "eslint --fix",
     "check-types": "tsc --noEmit",
     "chromatic": "npx chromatic"
